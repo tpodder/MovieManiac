@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="140dp"
+    android:background="#000000"
+    >
+
+
+
+
+        <ImageView
+            android:id="@+id/list_item_icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerVertical="true"/>
+
+
+    <TextView
+        android:id="@+id/list_item_movieName"
+        android:layout_width="100dp"
+        android:layout_below="@id/list_item_icon"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:textColor="#ffffff"
+        android:textSize="10dp"
+        android:textStyle="bold"
+        android:layout_gravity="right|bottom"
+        android:layout_centerHorizontal="true"
+        android:gravity="center" />
+
+
+</RelativeLayout>
