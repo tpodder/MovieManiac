@@ -6,6 +6,7 @@ package com.example.android.moviemaniac;
  */
 public class ReviewAdapter /*extends CursorAdapter*/ {
 
+    //Started Coding but not finished
     /*Context c;
     private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
 

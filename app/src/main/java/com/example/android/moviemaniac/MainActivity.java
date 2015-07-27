@@ -65,12 +65,4 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-//
-//    public void onItemSelected(Uri contentUri) {
-//
-//            Intent intent = new Intent(this, DetailFragment.class)
-//                    .setData(contentUri);
-//            startActivity(intent);
-//
-//    }
 }

@@ -8,7 +8,7 @@ import android.test.AndroidTestCase;
  * Created by Tanushree on 2015-07-25.
  */
 public class TestUriMatcher extends AndroidTestCase {
-// content://com.example.android.sunshinemovie
+        // content://com.example.android.moviemaniac
     private static final Uri TEST_MOVIE_DIR = MovieContract.MovieEntry.CONTENT_URI;
   /*
         Students: This function tests that your UriMatcher returns the correct integer value
@@ -22,4 +22,5 @@ public class TestUriMatcher extends AndroidTestCase {
                 testMatcher.match(TEST_MOVIE_DIR), MovieProvider.MOVIE);
 
     }
+
 }

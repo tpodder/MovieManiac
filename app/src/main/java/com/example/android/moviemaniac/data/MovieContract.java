@@ -78,6 +78,8 @@ public class MovieContract {
 
     }
 
+    //Stage 2 - Trailers, Reviews Favourites
+
 //    /* Inner class that defines the table contents of the trailer table */
 //    public static final class MovieTrailerEntry implements BaseColumns {
 //            //Store key and name

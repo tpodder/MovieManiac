@@ -10,6 +10,7 @@ import com.example.android.moviemaniac.data.MovieContract.MovieEntry;
  * Created by Tanushree on 2015-07-25.
  */
 public class MovieDbHelper extends SQLiteOpenHelper{
+
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 2;
 

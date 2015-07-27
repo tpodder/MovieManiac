@@ -216,7 +216,5 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         }
         return null;
 
-
     }
-
 }

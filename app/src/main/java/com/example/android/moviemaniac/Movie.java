@@ -4,7 +4,6 @@ package com.example.android.moviemaniac;
  */
 
 public class Movie {
-
         String movieName;
         String movieLink;
         String movieReleaseDate;

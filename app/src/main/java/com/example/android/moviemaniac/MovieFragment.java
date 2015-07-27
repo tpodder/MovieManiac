@@ -130,35 +130,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 }
 
                 mPosition = position;
-
-
-//        //On clicking a Movie Poster, launch an intent to display details of the movie
-//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//
-//                Movie movie = movieAdapter.getItem(position);
-//
-//                /*Declaring variables containing values in keys for putExtra()
-//                  Source: http://developer.android.com/guide/components/intents-filters.html
-//                        http://developer.android.com/reference/android/content/Intent.html*/
-//                String intentName = movie.movieName;
-//                String intentImg = movie.movieLink;
-//                String intentReleaseDate = movie.movieReleaseDate;
-//                String intentRating = movie.movieRating;
-//                String intentOverview = movie.movieOverview;
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .putExtra(EXTRA_NAME, intentName);
-//                intent.putExtra(EXTRA_LINK, intentImg);
-//                intent.putExtra(EXTRA_RDATE, intentReleaseDate);
-//                intent.putExtra(EXTRA_RATING, intentRating);
-//                intent.putExtra(EXTRA_OVERVIEW, intentOverview);
-//                startActivity(intent);
-//            }
-
-
-            }});
+           }});
             return rootView;
     }
     @Override
@@ -202,6 +174,30 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         movieAdapter.swapCursor(null);
     }
 
-//
 }
+
+//        //On clicking a Movie Poster, launch an intent to display details of the movie
+//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//
+//                Movie movie = movieAdapter.getItem(position);
+//
+//                /*Declaring variables containing values in keys for putExtra()
+//                  Source: http://developer.android.com/guide/components/intents-filters.html
+//                        http://developer.android.com/reference/android/content/Intent.html*/
+//                String intentName = movie.movieName;
+//                String intentImg = movie.movieLink;
+//                String intentReleaseDate = movie.movieReleaseDate;
+//                String intentRating = movie.movieRating;
+//                String intentOverview = movie.movieOverview;
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                        .putExtra(EXTRA_NAME, intentName);
+//                intent.putExtra(EXTRA_LINK, intentImg);
+//                intent.putExtra(EXTRA_RDATE, intentReleaseDate);
+//                intent.putExtra(EXTRA_RATING, intentRating);
+//                intent.putExtra(EXTRA_OVERVIEW, intentOverview);
+//                startActivity(intent);
+//            }
 

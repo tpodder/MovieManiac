@@ -15,8 +15,7 @@ import com.squareup.picasso.Picasso;
 
 public class MovieAdapter extends CursorAdapter {
 
-    //Declaring variables for array list of movies, the context and a logtag for debugging
-   // List<Movie> movies = new ArrayList<>();
+    //Declaring the context and a logtag for debugging
     Context c;
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 

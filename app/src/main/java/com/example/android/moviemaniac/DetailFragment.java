@@ -22,6 +22,8 @@ import com.squareup.picasso.Picasso;
 
 /**
  * Created by Tanushree on 2015-07-27.
+ *
+ * Detail Fragment Class
  */
 public  class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 

@@ -17,4 +17,5 @@ public class FullTestSuite extends TestSuite {
     public FullTestSuite() {
         super();
     }
+
 }
