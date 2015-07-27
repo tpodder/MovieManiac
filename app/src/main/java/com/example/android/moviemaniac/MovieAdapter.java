@@ -2,63 +2,50 @@ package com.example.android.moviemaniac;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.moviemaniac.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
+public class MovieAdapter extends CursorAdapter {
 
-public class MovieAdapter extends ArrayAdapter<Movie> {
-
-    List<Movie> movies = new ArrayList<>();
-    //String[] urls = new String[]{};
-    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
+    //Declaring variables for array list of movies, the context and a logtag for debugging
+   // List<Movie> movies = new ArrayList<>();
     Context c;
+    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
-    public MovieAdapter(Activity context, List<Movie> movies) {
+   //adapter constructor
+    public MovieAdapter(Activity context,Cursor cursor, int flags) {
 
-        super(context, 0, movies);
-        this.movies= movies;
-        c= context;
+        super(context, cursor, flags);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = LayoutInflater.from(context).inflate(R.layout.grid_item_layout, parent, false);
+        bindView(view,context,cursor);
+         return view;
+        }
 
-            Movie movie = getItem(position);
+    public void bindView(View view, Context context, Cursor cursor) {
+        //Declaring views for Movie Posters(Image View) and MovieName(Text View)
+        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
 
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_layout, parent, false);
-            }
+        TextView movieNameView = (TextView) view.findViewById(R.id.list_item_movieName);
+        movieNameView.setText(cursor.getString(cursor.getColumnIndex
+                (MovieContract.MovieEntry.COLUMN_MOVIE_TITLE)));
 
-            ImageView iconView = (ImageView) convertView.findViewById(R.id.list_item_icon);
-            iconView.setImageResource(movie.image);
-
-            TextView movieNameView = (TextView) convertView.findViewById(R.id.list_item_movieName);
-            movieNameView.setText(movie.movieName);
-
-            /*final String MOVIE_BASE_URL = " http://image.tmdb.org/t/p/";
-            final String SIZE = "w92";
-            final String POSTER_PATH = "poster_path";*/
-            // ?????????????????????
-            /*Uri uri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                    .appendPath(SIZE)
-                    .appendPath(value)
-                    .build();*/
-             //Uri uri = Uri.parse(VALUE);
-
-            final String VALUE = movie.movieLink;
-
-            Picasso.with(c).setLoggingEnabled(true);
-            Picasso.with(c).load(movie.movieLink).error(R.drawable.image_url).into(iconView);
-
-
-            return convertView;
+        //Loading and the Movie Posters into the image view using Picasso and logging the poster URLs
+        Picasso.with(context).setLoggingEnabled(true);
+        Picasso.with(context).load(cursor.getString(cursor.getColumnIndex
+                (MovieContract.MovieEntry.COLUMN_POSTER_LINK)))
+                .placeholder(R.drawable.image_url).into(iconView);
     }
 
     }

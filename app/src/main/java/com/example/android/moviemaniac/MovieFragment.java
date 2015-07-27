@@ -1,40 +1,75 @@
 package com.example.android.moviemaniac;
 
-import android.os.AsyncTask;
+
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.android.moviemaniac.data.MovieContract;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 
-public class MovieFragment extends Fragment {
 
-    private MovieAdapter movieAdapter;
-    GridView gridview;
-    Movie[] testMovies = {
-            new Movie("Jurassic World", R.drawable.jw),
-            new Movie("Terminator Genesis", R.drawable.tg),
-            new Movie("Minions", R.drawable.m)
+/* http://maciejpasynkiewicz.com/?p=79
+   Encapsulates fetching Movie Data and displaying it in a Grid View format
+ */
+
+public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+
+
+    private static final int MOVIE_LOADER=0;
+
+    private static final String[] MOVIE_COLUMNS ={
+            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieEntry.COLUMN_REVIEWS
     };
 
+    static final int COLUMN_ID=0;
+    static final int COLUMN_MOVIE_ID = 1;
+    static final int COLUMN_MOVIE_TITLE = 2;
+    static final int COLUMN_POSTER_LINK = 3;
+    static final int COLUMN_RELEASE_DATE = 4;
+    static final int COLUMN_RATING = 5;
+    static final int COLUMN_OVERVIEW = 6;
+    static final int COLUMN_TRAILER_LINKS = 7;
+    static final int COLUMN_REVIEWS = 8;
+
+    //Declaring variables for the movie adapter and gridview
+    private MovieAdapter movieAdapter;
+    GridView gridView;
+    private int mPosition=gridView.INVALID_POSITION;
+
+    //Constants containing key names for putExtra() function
+    public final static String EXTRA_NAME= "movieName";
+    public final static String EXTRA_LINK= "movieLink";
+    public final static String EXTRA_RDATE= "movieReleaseDate";
+    public final static String EXTRA_RATING= "movieRating";
+    public final static String EXTRA_OVERVIEW= "movieOverview";
+
     public MovieFragment() {}
+
+    public interface Callback{
+        public void onItemSelected(Uri uri);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +83,7 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.movie_fragment, menu);
+
     }
 
     @Override
@@ -56,9 +92,9 @@ public class MovieFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        //Action performed by refresh button in the menu
         if (id == R.id.action_refresh) {
-            FetchMovieTask movieTask = new FetchMovieTask();
-            movieTask.execute();
+            updateMovie();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -69,154 +105,103 @@ public class MovieFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        //Get cursor and Initialize adapter, get a reference to GridView, set adapter to ot and update data
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        movieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
-        gridview = (GridView) rootView.findViewById(R.id.gridview);
-        gridview.setAdapter(movieAdapter);
-        String url = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=84604ead3481bd3bbd687f383f87e738";
-        FetchMovieTask movieTask = new FetchMovieTask();
-        //Pass parameters
-        movieTask.execute(url);
-        return rootView;
+        movieAdapter = new MovieAdapter(getActivity(),null,0);
+        gridView = (GridView) rootView.findViewById(R.id.gridview);
+        gridView.setAdapter(movieAdapter);
 
+        // The CursorAdapter will take data from our cursor and populate the ListView
+        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
+        // up with an empty list the first time we run.
+
+        // We'll call our MainActivity
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+
+                    ((Callback) getActivity()).onItemSelected(
+                            MovieContract.MovieEntry.buildMovieUri(l));
+                }
+
+                mPosition = position;
+
+
+//        //On clicking a Movie Poster, launch an intent to display details of the movie
+//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//
+//                Movie movie = movieAdapter.getItem(position);
+//
+//                /*Declaring variables containing values in keys for putExtra()
+//                  Source: http://developer.android.com/guide/components/intents-filters.html
+//                        http://developer.android.com/reference/android/content/Intent.html*/
+//                String intentName = movie.movieName;
+//                String intentImg = movie.movieLink;
+//                String intentReleaseDate = movie.movieReleaseDate;
+//                String intentRating = movie.movieRating;
+//                String intentOverview = movie.movieOverview;
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                        .putExtra(EXTRA_NAME, intentName);
+//                intent.putExtra(EXTRA_LINK, intentImg);
+//                intent.putExtra(EXTRA_RDATE, intentReleaseDate);
+//                intent.putExtra(EXTRA_RATING, intentRating);
+//                intent.putExtra(EXTRA_OVERVIEW, intentOverview);
+//                startActivity(intent);
+//            }
+
+
+            }});
+            return rootView;
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
+    void onSortOrderChanged( ) {
+        updateMovie();
+        getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
+    //Executes FetchMovieTask
+    private void updateMovie() {
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        String sortBy = Utility.getPreferredSortOrder(getActivity());
 
-
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
-        public ArrayList<Movie> getMovieDataFromJson(String movieJSONStr) throws JSONException {
-
-            ArrayList<Movie> movieArr = new ArrayList<>();
-            ArrayList<String> moviePosters= new ArrayList<>();
-            ArrayList<String> movieTitles= new ArrayList<>();
-            final String MOVIE_BASE_URL = "http://image.tmdb.org/t/p/w92/";
-            final String RESULTS = "results";
-            final String POSTER_PATH = "poster_path";
-            final String TITLE = "title";
-            String movieName;
-            String urlPart;
-            JSONObject movieJson = new JSONObject(movieJSONStr);
-            JSONArray movieArray = movieJson.getJSONArray(RESULTS);
-            try {
-                for (int i = 0; i < movieArray.length(); i++) {
-
-
-                    // Get the JSON object representing the movie
-                    JSONObject movie = movieArray.getJSONObject(i);
-
-                    // Movie Name
-                    movieName = movie.getString(TITLE);
-
-                    urlPart = movie.getString(POSTER_PATH);
-
-                    movieTitles.add( movieName );
-                    moviePosters.add( MOVIE_BASE_URL + urlPart );
-                    movieArr.add( new Movie(movieTitles.get(i), moviePosters.get(i)));
-
-
-                }
-            } catch (JSONException e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-
-            return movieArr;
-        }
-
-
-        @Override
-        protected ArrayList<Movie> doInBackground(String... params) {
-            if (params.length == 0) {
-                return null;
-            }
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // Will contain the raw JSON response as a string.
-            String movieJsonStr = null;
-            String sort_by = "popularity.desc";
-            String ampersand = "&";
-
-            try {
-
-                /*final String FORECAST_BASE_URL =
-                        "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&sort_by=popularity.desc";
-                final String QUERY_PARAM = "sort_by";
-               */
-
-                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=84604ead3481bd3bbd687f383f87e738");
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                movieJsonStr = buffer.toString();
-
-                Log.v(LOG_TAG, "Movie string: " + movieJsonStr);
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-
-                try {
-                    return getMovieDataFromJson(movieJsonStr);
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, e.getMessage(), e);
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        protected void onPostExecute(ArrayList<Movie> movies) /*throws JSONException*/ {
-
-                movieAdapter.clear();
-                for (Movie movie : movies) {
-                    movieAdapter.add(movie);
-                }
-               Log.d(LOG_TAG, "movielist updated");
-
-        }
+        movieTask.execute(sortBy);
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+        return new CursorLoader(getActivity(),
+                uri,
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        movieAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        movieAdapter.swapCursor(null);
+    }
+
 
 }
 

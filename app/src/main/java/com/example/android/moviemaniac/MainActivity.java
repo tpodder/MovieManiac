@@ -1,17 +1,30 @@
 package com.example.android.moviemaniac;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class MainActivity extends ActionBarActivity {
+    private final String MOVIEFRAGMENT_TAG = "MFTAG";
+    private String sortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sortOrder = Utility.getPreferredSortOrder(this);
         super.onCreate(savedInstanceState);
+        android.support.v7.app.ActionBar menu = getSupportActionBar();
+        // http://stackoverflow.com/questions/19540648/android-how-to-show-app-logo-in-action-bar
+        menu.setDisplayShowHomeEnabled(true);
+        menu.setLogo(R.mipmap.ic_launcher);
+        menu.setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_main);
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//            .add(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG)
+//                    .commit();
     }
 
 
@@ -31,9 +44,33 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String order = Utility.getPreferredSortOrder(this);
+        // update the location in our second pane using the fragment manager
+        if (order != null && !order.equals(sortOrder)) {
+            MovieFragment ff = (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+            if (null != ff) {
+                ff.onSortOrderChanged();
+            }
+            sortOrder = order;
+        }
+    }
+
+//
+//    public void onItemSelected(Uri contentUri) {
+//
+//            Intent intent = new Intent(this, DetailFragment.class)
+//                    .setData(contentUri);
+//            startActivity(intent);
+//
+//    }
 }
