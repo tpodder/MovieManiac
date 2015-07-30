@@ -28,7 +28,8 @@ public class MovieAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.grid_item_layout, parent, false);
-        bindView(view,context,cursor);
+//        bindView(view,context,cursor);
+
          return view;
         }
 
@@ -45,6 +46,7 @@ public class MovieAdapter extends CursorAdapter {
         Picasso.with(context).load(cursor.getString(cursor.getColumnIndex
                 (MovieContract.MovieEntry.COLUMN_POSTER_LINK)))
                 .placeholder(R.drawable.image_url).into(iconView);
+
     }
 
     }

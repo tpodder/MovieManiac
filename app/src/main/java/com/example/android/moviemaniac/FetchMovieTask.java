@@ -64,17 +64,20 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         //Movie id to insert in BASE_URL
         int id;
 
-        JSONObject movieJson = new JSONObject(movieJSONStr);
-        JSONArray movieArray = movieJson.getJSONArray(RESULTS);
+
         try {
+
+            JSONObject movieJson = new JSONObject(movieJSONStr);
+            JSONArray movieArray = movieJson.getJSONArray(RESULTS);
+            // Insert the new weather information into the database
+            Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
+
             for (int i = 0; i < movieArray.length(); i++) {
 
 
                 // Get the JSON object representing the movie
                 JSONObject movie = movieArray.getJSONObject(i);
 
-                // Insert the new weather information into the database
-                Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
 
                 // Get movie Data
                 movieName = movie.getString(TITLE);
@@ -101,20 +104,21 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
                 cVVector.add(movieValues);
 
-                int inserted = 0;
+            }
 
-                // add to database
-                if (cVVector.size() > 0) {
+            int inserted = 0;
+
+
+            // add to database
+
+            if (cVVector.size() > 0) {
                     ContentValues[] cvArray = new ContentValues[cVVector.size()];
                     cVVector.toArray(cvArray);
                     inserted = context.getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+
                 }
 
-
                 Log.d(LOG_TAG, "FetchMovieTask Complete. " + inserted + " Inserted");
-
-
-            }
 
         } catch (JSONException e) {
             Log.e("Error", e.getMessage());

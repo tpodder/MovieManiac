@@ -110,8 +110,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         movieAdapter = new MovieAdapter(getActivity(),null,0);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
         gridView.setAdapter(movieAdapter);
-
-        // The CursorAdapter will take data from our cursor and populate the ListView
+         // The CursorAdapter will take data from our cursor and populate the ListView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
 
@@ -148,7 +147,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private void updateMovie() {
         FetchMovieTask movieTask = new FetchMovieTask(getActivity());
         String sortBy = Utility.getPreferredSortOrder(getActivity());
-
         movieTask.execute(sortBy);
     }
 

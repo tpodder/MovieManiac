@@ -86,6 +86,7 @@ public class MovieProvider extends ContentProvider {
 
 
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+//        retCursor.close();
         return retCursor;
     }
 
@@ -108,6 +109,7 @@ public class MovieProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
+        db.close();
         return returnUri;
     }
 
@@ -131,12 +133,14 @@ public class MovieProvider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        db.close();
         return rowsDeleted;
     }
 
 
     @Override
     public int update(
+
             Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         // Student: This is a lot like the delete function.  We return the number of rows impacted
         // by the update.
@@ -157,6 +161,7 @@ public class MovieProvider extends ContentProvider {
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        db.close();
         return rowsUpdated;
     }
 
@@ -180,10 +185,14 @@ public class MovieProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                db.close();
                 return returnCount;
             default:
+                db.close();
                 return super.bulkInsert(uri, values);
+
         }
+
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing
