@@ -23,6 +23,7 @@ import java.util.Vector;
 
 /**
  * Created by Tanushree on 2015-07-25.
+ * NOTE : API KEY HIDDEN 
  */
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
@@ -55,8 +56,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
         final String OVERVIEW = "overview";
         final String ID = "id";
         final String BASE_URL = "http://api.themoviedb.org/3/movie/";
-        final String MOVIE_TAILER_APPEND_URL = "/videos?api_key=84604ead3481bd3bbd687f383f87e738";
-        final String MOVIE_REVIEWS_APPEND_URL = "/reviews?api_key=84604ead3481bd3bbd687f383f87e738";
+        final String MOVIE_TAILER_APPEND_URL = "/videos?api_key=###";
+        final String MOVIE_REVIEWS_APPEND_URL = "/reviews?api_key=###";
 
         //Strings containing the data
         String movieName, urlPart, releaseDate, rating, overview, trailerLinks, reviews;
@@ -152,9 +153,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             String MOVIE_BASE_URL;
             String preferenceChange=context.getString(R.string.pref_sortOrder_highestRated);
             if(params[0].equals(preferenceChange))
-                MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=500&";
+                MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=####vote_count.gte=500&";
             else
-                MOVIE_BASE_URL="http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738";
+                MOVIE_BASE_URL="http://api.themoviedb.org/3/discover/movie?api_key=####";
 
 
             // Construct the URL for The Movie Database query
