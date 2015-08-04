@@ -107,16 +107,6 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
     }
 
-//        void onSortOrderChanged( String newSortOrder ) {
-//            // replace the uri, since the location has changed
-//            Uri uri = mUri;
-//
-////            if (null != uri) {
-////                Uri updatedUri = MovieContract.MovieEntry.buildMovieUri();
-////                mUri = updatedUri;
-////                getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-////            }
-//        }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -138,7 +128,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         Log.v(LOG_TAG, "In onLoadFinished");
         if (data != null && data.moveToFirst()) {
             //Detail Activity via Intent
-            // The detail Activity called via intent.  Inspect the intent for forecast data.
+            //The detail Activity called via intent.  Inspect the intent for movie data.
             //Movie Name
             String movieTitle = data.getString(COLUMN_MOVIE_TITLE);
             textTitle.setText(movieTitle);

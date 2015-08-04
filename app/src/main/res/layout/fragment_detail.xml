@@ -1,107 +1,126 @@
-<ScrollView
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-<LinearLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".DetailActivity$DetailFragment"
-android:background="#fffffdf1"
-    android:orientation="horizontal"
-    >
-
-    <TextView android:layout_width="match_parent"
-    android:layout_height="110dp"
-    android:id="@+id/detail_text"
-    android:textSize= "30dp"
-    android:textStyle="bold"
-    android:textColor="#fffffdf1"
-    android:background="#ff703e7c"
-    android:gravity="center"/>
-
-    <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="175dp"
-    android:id="@+id/relative"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="10dp"
-    android:layout_below="@+id/detail_text"
-    android:background="#fffffdf1">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#fffffdf1"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.moviemaniac.DetailFragment">
 
-<ImageView
-    android:layout_width="125dp"
-    android:layout_height="168dp"
-    android:paddingLeft="16dp"
-    android:id="@+id/detail_img" />
-
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/detail_releaseDate"
-        android:paddingTop="3dp"
-        android:paddingLeft="16dp"
-        android:textSize = "18dp"
-        android:textStyle="bold"
-        android:textColor="#ff703e7c"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/detail_rating"
-        android:paddingTop="16dp"
-        android:paddingLeft="16dp"
-        android:textSize = "18dp"
-        android:textStyle="bold"
-        android:textColor="#ff703e7c"
-        android:layout_marginTop="20dp" />
-</RelativeLayout>
-
-
-</LinearLayout>
- <TextView
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:id="@+id/detail_overview"
-     android:paddingTop="10dp"
-     android:paddingLeft="10dp"
-     android:textSize = "18dp"
-     android:textStyle="bold"
-     android:textColor="#ff703e7c"
-     android:layout_below="@+id/relative"
-     android:layout_alignParentLeft="true"
-     android:layout_alignParentStart="true" />
-
-    <!--ListViews for trailers and reviews - INCOMPLETE
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_trailer"
-        android:layout_below="@+id/detail_overview">
-        <VideoView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/video"/>
-
-    </ListView>
-
-    <ListView
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_reviews"
-        android:layout_below="@+id/list_trailer"
+        android:layout_height="900dp"
+        android:orientation="vertical"
         >
-        <TextView
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/reviews"/>
-    </ListView>-->
+            android:layout_height="match_parent"
+            android:background="#fffffdf1"
+            android:orientation="vertical"
+            >
+
+            <TextView android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:id="@+id/detail_text"
+                android:textSize= "30dp"
+                android:textStyle="bold"
+                android:textColor="#fffffdf1"
+                android:background="#ff703e7c"
+                android:gravity="center"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="175dp"
+                android:id="@+id/relative"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="10dp"
+                android:layout_below="@+id/detail_text"
+                android:background="#fffffdf1">
+
+                <ImageView
+                    android:layout_width="125dp"
+                    android:layout_height="168dp"
+                    android:paddingLeft="16dp"
+                    android:id="@+id/detail_img" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/detail_releaseDate"
+                        android:paddingTop="3dp"
+                        android:paddingLeft="16dp"
+                        android:textSize = "18dp"
+                        android:textStyle="bold"
+                        android:textColor="#ff703e7c"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/detail_rating"
+                        android:paddingTop="16dp"
+                        android:paddingLeft="16dp"
+                        android:textSize = "18dp"
+                        android:textStyle="bold"
+                        android:textColor="#ff703e7c"
+                        android:layout_marginTop="20dp" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_overview"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize = "18dp"
+                android:textStyle="bold"
+                android:textColor="#ff703e7c"
+                android:background="#fffffdf1"
+                android:layout_below="@+id/relative"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
 
 
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
 
-</LinearLayout>
+    <!--&lt;!&ndash;ListViews for trailers and reviews - INCOMPLETE-->
+    <!--<ListView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/list_trailer"-->
+    <!--android:layout_below="@+id/detail_overview">-->
+    <!--<VideoView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/video"/>-->
 
-</ScrollView>
+    <!--</ListView>-->
+
+    <!--<ListView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/list_reviews"-->
+    <!--android:layout_below="@+id/list_trailer"-->
+    <!-->-->
+    <!--<TextView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/reviews"/>-->
+    <!--</ListView>&ndash;&gt;-->
+
+    <!--<LinearLayout-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--tools:context=".DetailActivity$DetailFragment"-->
+    <!--android:background="#fffffdf1"-->
+    <!--android:orientation="horizontal">-->

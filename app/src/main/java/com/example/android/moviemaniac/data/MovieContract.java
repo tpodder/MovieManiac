@@ -76,6 +76,15 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildMovieUriWithName(String movieID) {
+            return CONTENT_URI.buildUpon().appendPath(movieID)
+                    .build();
+        }
+
+        public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
     }
 
     //Stage 2 - Trailers, Reviews Favourites

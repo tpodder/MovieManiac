@@ -18,6 +18,7 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper mOpenHelper;
 
     static final int MOVIE = 100;
+    static final int MOVIE_WITH_ID=101;
 
     /*
         Students: Here is where you need to create the UriMatcher. This UriMatcher will
@@ -54,11 +55,13 @@ public class MovieProvider extends ContentProvider {
         switch (match) {
             case MOVIE:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
-
+            case MOVIE_WITH_ID:
+                return MovieContract.MovieEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
     }
+
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -66,27 +69,39 @@ public class MovieProvider extends ContentProvider {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
-        if(sUriMatcher.match(uri)==MOVIE)
-          {
-              retCursor = mOpenHelper.getReadableDatabase().query(
-                      MovieContract.MovieEntry.TABLE_NAME,
-                      projection,
-                      selection,
-                      selectionArgs,
-                      null,
-                      null,
-                      sortOrder
-              );
+        switch (sUriMatcher.match(uri)) {
 
+            // "movie/*"
+            case MOVIE_WITH_ID: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
             }
-         else{
-               throw new UnsupportedOperationException("Unknown uri: " + uri);
+            // "movie"
+            case MOVIE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
 
+                break;
             }
 
 
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
-//        retCursor.close();
         return retCursor;
     }
 

@@ -58,12 +58,14 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     GridView gridView;
     private int mPosition=gridView.INVALID_POSITION;
 
+
     //Constants containing key names for putExtra() function
     public final static String EXTRA_NAME= "movieName";
     public final static String EXTRA_LINK= "movieLink";
     public final static String EXTRA_RDATE= "movieReleaseDate";
     public final static String EXTRA_RATING= "movieRating";
     public final static String EXTRA_OVERVIEW= "movieOverview";
+    private static final String SELECTED_KEY = "selected_position";
 
     public MovieFragment() {}
 
@@ -110,6 +112,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         movieAdapter = new MovieAdapter(getActivity(),null,0);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
         gridView.setAdapter(movieAdapter);
+        updateMovie();
          // The CursorAdapter will take data from our cursor and populate the ListView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
@@ -125,12 +128,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 if (cursor != null) {
 
                     ((Callback) getActivity()).onItemSelected(
-                            MovieContract.MovieEntry.buildMovieUri(l));
+                            MovieContract.MovieEntry.buildMovieUriWithName
+                                    (cursor.getString(COLUMN_MOVIE_ID)));
                 }
 
                 mPosition = position;
            }});
-            return rootView;
+            if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
+        return rootView;
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -165,6 +175,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         movieAdapter.swapCursor(cursor);
+        if (mPosition != GridView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            gridView.smoothScrollToPosition(mPosition);
+        }
     }
 
     @Override

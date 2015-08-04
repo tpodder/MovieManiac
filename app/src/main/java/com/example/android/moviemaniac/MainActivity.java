@@ -69,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
     @Override
     public void onItemSelected(Uri contentUri) {
 
-            Intent intent = new Intent(this, DetailFragment.class)
+            Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
     }
