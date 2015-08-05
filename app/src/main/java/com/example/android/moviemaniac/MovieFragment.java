@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +28,7 @@ import com.example.android.moviemaniac.data.MovieContract;
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-
+    private static final String LOG_TAG = MovieFragment.class.getSimpleName();
 
     private static final int MOVIE_LOADER=0;
 
@@ -56,6 +57,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     //Declaring variables for the movie adapter and gridview
     private MovieAdapter movieAdapter;
     GridView gridView;
+    Cursor mCursor;
     private int mPosition=gridView.INVALID_POSITION;
 
 
@@ -112,7 +114,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         movieAdapter = new MovieAdapter(getActivity(),null,0);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
         gridView.setAdapter(movieAdapter);
-        updateMovie();
+
+        if(emptyDB()){
+            updateMovie();
+        }
+
          // The CursorAdapter will take data from our cursor and populate the ListView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
@@ -125,6 +131,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                Log.v(LOG_TAG, "Position=" + position);
                 if (cursor != null) {
 
                     ((Callback) getActivity()).onItemSelected(
@@ -133,15 +140,17 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 }
 
                 mPosition = position;
-           }});
+            }});
+
             if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            // The listview probably hasn't even been populated yet.  Actually perform the
-            // swapout in onLoadFinished.
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-        }
+                    // The listview probably hasn't even been populated yet.  Actually perform the
+                    // swapout in onLoadFinished.
+                    mPosition = savedInstanceState.getInt(SELECTED_KEY);
+            }
 
         return rootView;
     }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
@@ -186,6 +195,23 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         movieAdapter.swapCursor(null);
     }
+
+    //Database check
+    public Boolean emptyDB(){
+        mCursor = getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                MOVIE_COLUMNS,
+                null,
+                null,
+                null
+        );
+        if (mCursor== null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
 }
 

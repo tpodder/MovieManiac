@@ -127,6 +127,10 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         if (data != null && data.moveToFirst()) {
+
+            int position = data.getPosition();
+            Log.v(LOG_TAG, "Position="+position);
+            data.moveToPosition(position);
             //Detail Activity via Intent
             //The detail Activity called via intent.  Inspect the intent for movie data.
             //Movie Name

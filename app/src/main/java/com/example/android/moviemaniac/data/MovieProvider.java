@@ -35,6 +35,7 @@ public class MovieProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
         return matcher;
     }
 
@@ -154,9 +155,7 @@ public class MovieProvider extends ContentProvider {
 
 
     @Override
-    public int update(
-
-            Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         // Student: This is a lot like the delete function.  We return the number of rows impacted
         // by the update.
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
