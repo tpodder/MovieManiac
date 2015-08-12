@@ -63,6 +63,24 @@ public class MovieProvider extends ContentProvider {
         }
     }
 
+    private Cursor getMovieById(
+            Uri uri, String[] projection, String sortOrder) {
+
+        String id = MovieContract.MovieEntry.getIDFromUri(uri);
+        String selection =  MovieContract.MovieEntry.COLUMN_MOVIE_ID+ "=?";
+
+        return mOpenHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
+                projection,
+                selection,
+                new String[]{id},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+
+
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
@@ -74,14 +92,7 @@ public class MovieProvider extends ContentProvider {
 
             // "movie/*"
             case MOVIE_WITH_ID: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
+                retCursor = getMovieById(uri, projection, sortOrder);
                 break;
             }
             // "movie"

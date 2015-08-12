@@ -7,15 +7,20 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.moviemaniac.sync.MovieSyncAdapter;
+
 
 public class MainActivity extends ActionBarActivity implements MovieFragment.Callback{
-    private final String MOVIEFRAGMENT_TAG = "MFTAG";
+
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
     private String sortOrder;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sortOrder = Utility.getPreferredSortOrder(this);
         super.onCreate(savedInstanceState);
+        sortOrder = Utility.getPreferredSortOrder(this);
         android.support.v7.app.ActionBar menu = getSupportActionBar();
         // http://stackoverflow.com/questions/19540648/android-how-to-show-app-logo-in-action-bar
         menu.setDisplayShowHomeEnabled(true);
@@ -26,6 +31,26 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
 //            getSupportFragmentManager().beginTransaction()
 //            .add(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG)
 //                    .commit();
+        if(findViewById((R.id.movie_detail_container))!=null)
+        {
+            //the detail container view will be present only in the large-screen layouts
+            //(res/layout-sw600dp). If this view is present, then the activity should be
+            //in two-pane mode.
+            mTwoPane=true;
+            //in the two-pane mode, show the detail view in this activity by
+            //adding or replacing the detail fragment using a
+            //fragment transaction
+            if(savedInstanceState==null)
+            {
+                getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container, new DetailFragment(),
+                        DETAILFRAGMENT_TAG).commit();
+            }
+
+        } else {
+            mTwoPane=false;
+        }
+
+        MovieSyncAdapter.initializeSyncAdapter(this);
     }
 
 
@@ -56,11 +81,16 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
     protected void onResume() {
         super.onResume();
         String order = Utility.getPreferredSortOrder(this);
-        // update the location in our second pane using the fragment manager
+        // update the movies in our second pane using the fragment manager
         if (order != null && !order.equals(sortOrder)) {
-            MovieFragment ff = (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
-            if (null != ff) {
-                ff.onSortOrderChanged();
+            MovieFragment mf = (MovieFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_movie);
+            if (null != mf) {
+                mf.onSortOrderChanged();
+            }
+            DetailFragment df= (DetailFragment)getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+            if(null != df)
+            {
+                df.onSortOrderChanged(order);
             }
             sortOrder = order;
         }
@@ -69,9 +99,25 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
     @Override
     public void onItemSelected(Uri contentUri) {
 
+        if(mTwoPane)
+        {
+            //In the two-pane mode, show the detailview in this activity by
+            //adding or replacing the detail fragment using a
+            //fragment transaction
+            Bundle args= new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container,
+                    fragment,DETAILFRAGMENT_TAG).commit();
+        }
+         else {
             Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
             startActivity(intent);
+        }
     }
 
 }

@@ -64,7 +64,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     ListView videoList, reviewList;
 
     public DetailFragment() {
-        setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -107,6 +107,18 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
     }
 
+    void onSortOrderChanged(String newOrder)
+    {
+        Uri uri=mUri;
+        if( null != uri)
+        {
+            String id = MovieContract.MovieEntry.getIDFromUri(uri);
+            Uri updatedUri= MovieContract.MovieEntry.buildMovieUriWithName(id);
+            mUri=updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+
+        }
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -126,32 +138,39 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
-        if (data != null && data.moveToFirst()) {
+        data.moveToFirst();
+        if(data!=null)
+        {
+            do {
 
-            int position = data.getPosition();
-            Log.v(LOG_TAG, "Position="+position);
-            data.moveToPosition(position);
-            //Detail Activity via Intent
-            //The detail Activity called via intent.  Inspect the intent for movie data.
-            //Movie Name
-            String movieTitle = data.getString(COLUMN_MOVIE_TITLE);
-            textTitle.setText(movieTitle);
+                int position = data.getPosition();
+                Log.v(LOG_TAG, "Position=" + position);
+                data.moveToPosition(position);
 
-            //Image- Movie Poster
-            String movieLink = data.getString(COLUMN_POSTER_LINK);
-            Picasso.with(getActivity()).load(movieLink).resize(150, 200).placeholder(R.drawable.image_url).into(imgView);
+                //Detail Activity via Intent
+                //The detail Activity called via intent.  Inspect the intent for movie data.
+                //Movie Name
+                String movieTitle = data.getString(COLUMN_MOVIE_TITLE);
+                textTitle.setText(movieTitle);
 
-            //Release Date
-            String movieReleaseDate = data.getString(COLUMN_RELEASE_DATE);
-            textRD.setText(movieReleaseDate);
+                //Image- Movie Poster
+                String movieLink = data.getString(COLUMN_POSTER_LINK);
+                Picasso.with(getActivity()).load(movieLink).placeholder(R.drawable.image_url).into(imgView);
 
-            //Rating
-            String movieRating = data.getString(COLUMN_RATING);
-            textRating.setText(movieRating);
+                //Release Date
+                String movieReleaseDate = data.getString(COLUMN_RELEASE_DATE);
+                textRD.setText(movieReleaseDate);
 
-            //Overview
-            String movieOverview = data.getString(COLUMN_OVERVIEW);
-            textOverview.setText(movieOverview);
+                //Rating
+                String movieRating = data.getString(COLUMN_RATING)+"/10";
+                textRating.setText(movieRating);
+
+                //Overview
+                String movieOverview = data.getString(COLUMN_OVERVIEW);
+                textOverview.setText(movieOverview);
+            }
+            while(data.moveToNext());
+
 
             //Set Adapters
 //            videoList.setAdapter(trailerAdapter);
@@ -162,4 +181,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) { }
+
+
 }
+

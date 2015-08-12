@@ -24,5 +24,9 @@
     <string name="pref_sortOrder_highestRated" translatable="false">vote_average.desc</string>
     <string name="title_activity_detail">Movie Details</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">moviemaniac.example.com</string>
+    <string name="content_authority">com.example.android.moviemaniac</string>
+
 
 </resources>

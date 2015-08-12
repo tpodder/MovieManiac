@@ -28,7 +28,7 @@ public class MovieAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.grid_item_layout, parent, false);
-//        bindView(view,context,cursor);
+        bindView(view,context,cursor);
 
          return view;
         }

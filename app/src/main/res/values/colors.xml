@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_white">#fffffdf1</color>
+    <color name="purple">#ff703e7c</color>
+    <color name="grey">#cccccc</color>
+    <color name="purple_light">#fff8c7fd</color>
+    <color name="purple_lightBar">#ff703e7c</color>
+    <!--<color name="purple_lightBar">#ffe33895</color>-->
+    <!--<color name="purple_lightBar">#ff3da105</color>-->
+    <color name="purple_dark">#ff430f66</color>
+
+</resources>

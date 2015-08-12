@@ -47,7 +47,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
 
         //Constants for the base URL and the API keys
-        final String MOVIE_BASE_URL = "http://image.tmdb.org/t/p/w92/";
+        final String MOVIE_BASE_URL = "http://image.tmdb.org/t/p/w154/";
         final String RESULTS = "results";
         final String POSTER_PATH = "poster_path";
         final String TITLE = "title";

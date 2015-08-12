@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.android.moviemaniac.data.MovieContract;
+import com.example.android.moviemaniac.sync.MovieSyncAdapter;
 
 
 
@@ -31,6 +32,13 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final String LOG_TAG = MovieFragment.class.getSimpleName();
 
     private static final int MOVIE_LOADER=0;
+    private static final String SELECTED_KEY = "selected_position";
+
+    //Declaring variables for the movie adapter and gridview
+    private MovieAdapter movieAdapter;
+    GridView gridView;
+    Cursor mCursor;
+    private int mPosition=gridView.INVALID_POSITION;
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry._ID,
@@ -54,20 +62,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     static final int COLUMN_TRAILER_LINKS = 7;
     static final int COLUMN_REVIEWS = 8;
 
-    //Declaring variables for the movie adapter and gridview
-    private MovieAdapter movieAdapter;
-    GridView gridView;
-    Cursor mCursor;
-    private int mPosition=gridView.INVALID_POSITION;
-
-
-    //Constants containing key names for putExtra() function
-    public final static String EXTRA_NAME= "movieName";
-    public final static String EXTRA_LINK= "movieLink";
-    public final static String EXTRA_RDATE= "movieReleaseDate";
-    public final static String EXTRA_RATING= "movieRating";
-    public final static String EXTRA_OVERVIEW= "movieOverview";
-    private static final String SELECTED_KEY = "selected_position";
 
     public MovieFragment() {}
 
@@ -115,10 +109,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         gridView = (GridView) rootView.findViewById(R.id.gridview);
         gridView.setAdapter(movieAdapter);
 
-        if(emptyDB()){
-            updateMovie();
-        }
-
          // The CursorAdapter will take data from our cursor and populate the ListView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
@@ -132,14 +122,17 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 Log.v(LOG_TAG, "Position=" + position);
+
                 if (cursor != null) {
 
                     ((Callback) getActivity()).onItemSelected(
                             MovieContract.MovieEntry.buildMovieUriWithName
                                     (cursor.getString(COLUMN_MOVIE_ID)));
+
                 }
 
                 mPosition = position;
+
             }});
 
             if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
@@ -164,9 +157,25 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     //Executes FetchMovieTask
     private void updateMovie() {
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
-        String sortBy = Utility.getPreferredSortOrder(getActivity());
-        movieTask.execute(sortBy);
+//        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+//        String sortBy = Utility.getPreferredSortOrder(getActivity());
+//        movieTask.execute(sortBy);
+//        Intent intent = new Intent(getActivity(), MovieService.class);
+//        intent.putExtra(MovieService.SORT_ORDER,
+//                 Utility.getPreferredSortOrder(getActivity()));
+//        getActivity().startService(intent);
+//        Intent alarmIntent = new Intent(getActivity(), MovieService.AlarmReceiver.class);
+//        alarmIntent.putExtra(MovieService.SORT_ORDER,
+//                 Utility.getPreferredSortOrder(getActivity()));
+//
+//        //Wrap in a pending intent which only fires once.
+//        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
+//
+//        AlarmManager am =(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+//
+//        //Set the AlarmManager to wake up the system.
+//        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
+        MovieSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
@@ -179,6 +188,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 null,
                 null,
                 null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        // When tablets rotate, then currently selected item needs to be saved.
+        // When no item is selected, mPosition will be set to Gridview.INVALID_POSITION,
+        // so check for that before storing.
+        if(mPosition != GridView.INVALID_POSITION)
+        {
+            outState.putInt(SELECTED_KEY,mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -197,46 +219,30 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     //Database check
-    public Boolean emptyDB(){
+    public Boolean isEmptyDB(){
         mCursor = getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_COLUMNS,
                 null,
                 null,
                 null
         );
-        if (mCursor== null){
+        if (mCursor.getCount() == 0){
             return true;
-        }
-        else{
+        } else {
             return false;
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(isEmptyDB()){
+            updateMovie();
         }
     }
 
 
 }
 
-//        //On clicking a Movie Poster, launch an intent to display details of the movie
-//        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//
-//                Movie movie = movieAdapter.getItem(position);
-//
-//                /*Declaring variables containing values in keys for putExtra()
-//                  Source: http://developer.android.com/guide/components/intents-filters.html
-//                        http://developer.android.com/reference/android/content/Intent.html*/
-//                String intentName = movie.movieName;
-//                String intentImg = movie.movieLink;
-//                String intentReleaseDate = movie.movieReleaseDate;
-//                String intentRating = movie.movieRating;
-//                String intentOverview = movie.movieOverview;
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .putExtra(EXTRA_NAME, intentName);
-//                intent.putExtra(EXTRA_LINK, intentImg);
-//                intent.putExtra(EXTRA_RDATE, intentReleaseDate);
-//                intent.putExtra(EXTRA_RATING, intentRating);
-//                intent.putExtra(EXTRA_OVERVIEW, intentOverview);
-//                startActivity(intent);
-//            }
+
 

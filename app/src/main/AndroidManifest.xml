@@ -4,6 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Permissions required by the sync adapter -->
+    <uses-permission
+        android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"
@@ -26,7 +33,8 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingsTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -40,8 +48,33 @@
                 android:value=".MainActivity" />
         </activity>
         <provider
-                   android:authorities="com.example.android.moviemaniac"
-                   android:name=".data.MovieProvider" />
+            android:authorities="@string/content_authority"
+            android:name=".data.MovieProvider"
+            android:exported="false"
+            android:syncable="true" />
+
+                <!-- SyncAdapter's dummy authentication service -->
+                <service android:name=".sync.MovieAuthenticatorService">
+                    <intent-filter>
+                        <action android:name="android.accounts.AccountAuthenticator" />
+                    </intent-filter>
+                    <meta-data
+                        android:name="android.accounts.AccountAuthenticator"
+                        android:resource="@xml/authenticator" />
+                </service>
+
+        <!-- The SyncAdapter service -->
+        <service
+            android:name=".sync.MovieSyncService"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
     </application>
 
 </manifest>
