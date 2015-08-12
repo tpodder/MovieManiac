@@ -41,6 +41,15 @@ public class MovieDbHelper extends SQLiteOpenHelper{
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 
+        final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE IF NOT EXISTS " +
+                MovieContract.MovieReviewsEntry.TABLE_NAME + " (" +
+                MovieContract.MovieReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.MovieReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
+                MovieContract.MovieReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL, " + ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
+
     }
 
     @Override

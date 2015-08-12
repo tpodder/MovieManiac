@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.moviemaniac.AsyncTasks.FetchReviewTask;
 import com.example.android.moviemaniac.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
@@ -35,6 +36,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     private static final int DETAIL_LOADER=0;
     TrailerAdapter trailerAdapter;
     ReviewAdapter reviewAdapter;
+    Cursor mCursor;
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry._ID,
@@ -87,12 +89,17 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 //        trailerAdapter = new TrailerAdapter(getActivity(),null,0);
 //        videoList=(ListView)rootView.findViewById(R.id.list_trailer);
 //
-//        //Reviews
-//        reviewAdapter = new ReviewAdapter(getActivity(),null,0);
-//        reviewList=(ListView)rootView.findViewById(R.id.list_reviews);
+        //Reviews
+        reviewAdapter = new ReviewAdapter(getActivity(),null,0);
+        reviewList=(ListView)rootView.findViewById(R.id.list_reviews);
+//        FetchReviewTask reviewTask = new FetchReviewTask(getActivity());
+//        reviewTask.execute(mCursor.getString(COLUMN_REVIEWS));
+
+
 
         return rootView;
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -138,6 +145,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
+        reviewAdapter.swapCursor(data);
         data.moveToFirst();
         if(data!=null)
         {
@@ -168,6 +176,12 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
                 //Overview
                 String movieOverview = data.getString(COLUMN_OVERVIEW);
                 textOverview.setText(movieOverview);
+
+                //Review
+                reviewList.setAdapter(reviewAdapter);
+                FetchReviewTask reviewTask = new FetchReviewTask(getActivity());
+                reviewTask.execute(data.getString(COLUMN_REVIEWS));
+
             }
             while(data.moveToNext());
 
@@ -180,7 +194,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) { }
+    public void onLoaderReset(Loader<Cursor> loader) {reviewAdapter.swapCursor(null); }
 
 
 }

@@ -94,10 +94,36 @@ public class MovieContract {
 //            //Store key and name
 //    }
 //
-//    /* Inner class that defines the table contents of the trailer table */
-//    public static final class MovieReviewsEntry implements BaseColumns {
-//          //Store id, author and content
-//    }
+    /* Inner class that defines the table contents of the trailer table */
+    public static final class MovieReviewsEntry implements BaseColumns {
+
+              public static final String TABLE_NAME = "reviews";
+              //Store id, author and content
+              //Movie ID
+              public static final String COLUMN_MOVIE_ID="id";
+
+              //Review Author
+              public static final String COLUMN_AUTHOR = "review_author";
+
+              //Review Author
+              public static final String COLUMN_CONTENT = "review_content";
+
+            public static final Uri CONTENT_URI =
+                    BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+
+            public static final String CONTENT_TYPE =
+                    ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+            public static final String CONTENT_ITEM_TYPE =
+                    ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+
+
+            public static Uri buildMovieUri(long id) {
+                return ContentUris.withAppendedId(CONTENT_URI, id);
+    }
+
+
+
+        }
 //
 //    /* Inner class that defines the table contents of the table for FAVOURITE movies*/
 //    public static final class MovieFavouriteEntry implements BaseColumns {
