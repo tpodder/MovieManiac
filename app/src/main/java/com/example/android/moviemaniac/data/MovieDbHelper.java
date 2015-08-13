@@ -46,7 +46,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
                 MovieContract.MovieReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                 MovieContract.MovieReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.MovieReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL, " + ");";
+                MovieContract.MovieReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL " + ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
 
