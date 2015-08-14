@@ -2,7 +2,7 @@
 <resources>
     <!--Setting activitytheme -->
     <style name="SettingsTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/purple_lightBar</item>
+        <item name="colorPrimary">@color/purple_light</item>
         <item name="colorPrimaryDark">@color/purple_dark</item>
     </style>
 </resources>

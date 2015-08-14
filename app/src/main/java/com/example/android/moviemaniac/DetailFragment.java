@@ -39,7 +39,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     Cursor mCursor;
 
     private static final String[] MOVIE_COLUMNS ={
-            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER_LINK,
@@ -47,7 +47,10 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.MovieEntry.COLUMN_RATING,
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
-            MovieContract.MovieEntry.COLUMN_REVIEWS
+            MovieContract.MovieEntry.COLUMN_REVIEWS,
+
+            MovieContract.MovieReviewsEntry.COLUMN_AUTHOR,
+            MovieContract.MovieReviewsEntry.COLUMN_CONTENT,
     };
 
     static final int COLUMN_ID=0;
@@ -59,6 +62,8 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     static final int COLUMN_OVERVIEW = 6;
     static final int COLUMN_TRAILER_LINKS = 7;
     static final int COLUMN_REVIEWS = 8;
+    static final int COLUMN_AUTHOR= 9;
+    static final int COLUMN_CONTENT= 10;
 
     //Views
     TextView textTitle,textRD,textRating,textOverview;
@@ -120,7 +125,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         if( null != uri)
         {
             String id = MovieContract.MovieEntry.getIDFromUri(uri);
-            Uri updatedUri= MovieContract.MovieEntry.buildMovieUriWithName(id);
+            Uri updatedUri= MovieContract.MovieEntry.buildMovieUriWithMovieID(id);
             mUri=updatedUri;
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
 
@@ -147,13 +152,14 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         Log.v(LOG_TAG, "In onLoadFinished");
         reviewAdapter.swapCursor(data);
         data.moveToFirst();
-        if(data!=null)
+        if(data!=null && data.moveToFirst())
         {
-            do {
+//            do {
 
                 int position = data.getPosition();
                 Log.v(LOG_TAG, "Position=" + position);
                 data.moveToPosition(position);
+
 
                 //Detail Activity via Intent
                 //The detail Activity called via intent.  Inspect the intent for movie data.
@@ -177,13 +183,13 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
                 String movieOverview = data.getString(COLUMN_OVERVIEW);
                 textOverview.setText(movieOverview);
 
-                //Review
+//                //Review
                 reviewList.setAdapter(reviewAdapter);
                 FetchReviewTask reviewTask = new FetchReviewTask(getActivity());
                 reviewTask.execute(data.getString(COLUMN_REVIEWS));
 
-            }
-            while(data.moveToNext());
+//            }
+//            while(data.moveToNext());
 
 
             //Set Adapters
@@ -191,6 +197,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 //            reviewList.setAdapter(reviewAdapter);
 
         }
+
     }
 
     @Override

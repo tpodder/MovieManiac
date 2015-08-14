@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.android.moviemaniac.AsyncTasks.FetchReviewTask;
 import com.example.android.moviemaniac.R;
 import com.example.android.moviemaniac.Utility;
 import com.example.android.moviemaniac.data.MovieContract;
@@ -52,6 +53,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
         Log.d(LOG_TAG, "Starting sync");
         String sortOrder = Utility.getPreferredSortOrder(getContext());
         String movieJsonStr = null;
+        String reviewJsonStr = null;
 
 
         // These two need to be declared outside the try/catch
@@ -83,6 +85,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
 
             URL url = new URL(uri.toString());
             Log.d(LOG_TAG, uri.toString());
+
+
 
             // Create the request to The Movie Database, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();

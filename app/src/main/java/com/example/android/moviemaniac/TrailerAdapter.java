@@ -4,9 +4,8 @@ package com.example.android.moviemaniac;
  * Created by Tanushree on 2015-07-27.
  * Adapter for the list view to display trailers
  */
-public class TrailerAdapter /*extends CursorAdapter */{
+public class TrailerAdapter /*extends CursorAdapter*/ {
 
-    //Started Coding not finished yet
 //    Context c;
 //    private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
 //
@@ -17,13 +16,15 @@ public class TrailerAdapter /*extends CursorAdapter */{
 //
 //    @Override
 //    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-//        View view = LayoutInflater.from(context).inflate(R.layout.fragment_detail, parent, false);
-//        bindView(view,context,cursor);
+//        View view = LayoutInflater.from(context).inflate(R.layout.trailer_list_item, parent, false);
 //        return view;
 //    }
 //
 //    public void bindView(View view, Context context, Cursor cursor) {
 //
-////        VideoView videoView = (VideoView) view.findViewById(R.id.video);
+//        TextView textView = (TextView) view.findViewById(R.id.text);
+//        textView.setText("Trailers");
+//
+//        VideoView videoView = (VideoView) view.findViewById(R.id.video);
 //    }
 }

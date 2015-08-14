@@ -39,6 +39,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     GridView gridView;
     Cursor mCursor;
     private int mPosition=gridView.INVALID_POSITION;
+    Cursor cursorWithNewSortPreference;
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry._ID,
@@ -126,7 +127,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 if (cursor != null) {
 
                     ((Callback) getActivity()).onItemSelected(
-                            MovieContract.MovieEntry.buildMovieUriWithName
+                            MovieContract.MovieEntry.buildMovieUriWithMovieID
                                     (cursor.getString(COLUMN_MOVIE_ID)));
 
                 }
@@ -157,24 +158,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     //Executes FetchMovieTask
     private void updateMovie() {
-//        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
-//        String sortBy = Utility.getPreferredSortOrder(getActivity());
-//        movieTask.execute(sortBy);
-//        Intent intent = new Intent(getActivity(), MovieService.class);
-//        intent.putExtra(MovieService.SORT_ORDER,
-//                 Utility.getPreferredSortOrder(getActivity()));
-//        getActivity().startService(intent);
-//        Intent alarmIntent = new Intent(getActivity(), MovieService.AlarmReceiver.class);
-//        alarmIntent.putExtra(MovieService.SORT_ORDER,
-//                 Utility.getPreferredSortOrder(getActivity()));
-//
-//        //Wrap in a pending intent which only fires once.
-//        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
-//
-//        AlarmManager am =(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-//
-//        //Set the AlarmManager to wake up the system.
-//        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
         MovieSyncAdapter.syncImmediately(getActivity());
     }
 
@@ -216,31 +199,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         movieAdapter.swapCursor(null);
-    }
 
-    //Database check
-    public Boolean isEmptyDB(){
-        mCursor = getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null
-        );
-        if (mCursor.getCount() == 0){
-            return true;
-        } else {
-            return false;
-        }
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if(isEmptyDB()){
-            updateMovie();
-        }
-    }
-
 
 }
 

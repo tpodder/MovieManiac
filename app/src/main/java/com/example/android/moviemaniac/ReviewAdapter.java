@@ -3,6 +3,7 @@ package com.example.android.moviemaniac;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,10 @@ public class ReviewAdapter extends CursorAdapter {
 
     public void bindView(View view, Context context, Cursor cursor) {
 
+
+        TextView textView = (TextView) view.findViewById(R.id.text);
+        textView.setText("Reviews");
+
         TextView reviewView = (TextView) view.findViewById(R.id.reviews);
         reviewView.setText(cursor.getString(cursor.getColumnIndex
                 (MovieContract.MovieReviewsEntry.COLUMN_CONTENT))+":");
@@ -41,5 +46,7 @@ public class ReviewAdapter extends CursorAdapter {
         TextView authorView = (TextView) view.findViewById(R.id.author);
         authorView.setText(cursor.getString(cursor.getColumnIndex
                 (MovieContract.MovieReviewsEntry.COLUMN_AUTHOR)));
+
+        DatabaseUtils.dumpCursor(cursor);
     }
 }

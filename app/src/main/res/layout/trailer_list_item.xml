@@ -12,18 +12,9 @@
         android:gravity="center"
         android:id="@+id/text"/>
 
-    <TextView
+    <VideoView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_light"
-        android:textSize="18sp"
-        android:id="@+id/author"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/purple_light"
-        android:textSize="18sp"
-        android:id="@+id/reviews"
-        />
+        android:id="@+id/video"/>
 
 </LinearLayout>

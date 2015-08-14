@@ -47,6 +47,7 @@ public class MovieAdapter extends CursorAdapter {
                 (MovieContract.MovieEntry.COLUMN_POSTER_LINK)))
                 .placeholder(R.drawable.image_url).into(iconView);
 
+
     }
 
     }

@@ -16,4 +16,5 @@ public class Utility {
                 context.getString(R.string.pref_sortOrder_key),
                 context.getString(R.string.pref_sortOrder_mostPopular));
     }
+
 }

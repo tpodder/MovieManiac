@@ -46,7 +46,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
                 MovieContract.MovieReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                 MovieContract.MovieReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.MovieReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL, " + ");";
+                MovieContract.MovieReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL " + ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
 
@@ -61,6 +61,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieReviewsEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
