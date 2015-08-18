@@ -52,38 +52,22 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
+
         String sortOrder = Utility.getPreferredSortOrder(getContext());
         String movieJsonStr = null;
         String reviewJsonStr= null;
 
-//
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
-//        HttpURLConnection urlConnection = null;
-//        BufferedReader reader = null;
-
-//        for( int k=0; k<1; k++)
+        //Clear the urls stored during the previous Sync
         urls.clear();
-        int k=0;
+        
 
             URL urlMain;
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            try {/*
-                   If the preference is highest rated movies then the base URL will contain a vote count key also
-                   so that movies which have less than 70 votes are eliminated from the list
-
-                   If the preference is popularity, base url contains only api_key
-                 */
-                    String MOVIE_BASE_URL;
-//            String preferenceChange= this.getString(R.string.pref_sortOrder_highestRated);
-//                if(sortOrder == getString(R.string.pref_sortOrder_highestRated)) {
-//                    MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=500&";
-//                } else {
-                    MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=70&";
-//                }
+            try {
+                    String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=70&";
 
                     // Construct the URL for The Movie Database query
                     final String QUERY_PARAM = "sort_by";
@@ -95,54 +79,60 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                     urlMain= url;
                     Log.d(LOG_TAG, uri.toString());
                     urls.add(url);
-                Log.v(LOG_TAG, "Outside for loop size " + urls.size());
-                int max=21;
-                for (int i = 0; i < max ; i++) {
-                    Log.v(LOG_TAG, "Size of urls array list " + urls.size() + "number of time for loop executed"+ i);
-                     //Create the request to The Movie Database, and open the connection
-                    if(k==0)
-                    {
-                        urlConnection = (HttpURLConnection)urlMain.openConnection();
-                    }else if(k==1)
-                    {
-                        urlConnection=(HttpURLConnection)urls.get(i).openConnection();
-                    }
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.connect();
+
+                    //Maximum number of movies requested from API is 20 + 1 for the main url
+                    int max=21;
+                    int k=0;
+                    for (int i = 0; i < max ; i++) {
+
+                        //Create the request to The Movie Database, and open the connection
+                        if(k==0)
+                        {
+                            urlConnection = (HttpURLConnection)urlMain.openConnection();
+                        }else if(k==1)
+                        {
+                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
+                        }
+
+                        urlConnection.setRequestMethod("GET");
+                        urlConnection.connect();
 
 
-                    // Read the input stream into a String
-                    InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
-                    if (inputStream == null) {
-                        // Nothing to do.
-                        return;
-                    }
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                        // Read the input stream into a String
+                        InputStream inputStream = urlConnection.getInputStream();
+                        StringBuffer buffer = new StringBuffer();
+                        if (inputStream == null) {
+                            // Nothing to do.
+                            return;
+                        }
+                        reader = new BufferedReader(new InputStreamReader(inputStream));
 
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append(line + "\n");
-                    }
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                            // But it does make debugging a *lot* easier if you print out the completed
+                            // buffer for debugging.
+                            buffer.append(line + "\n");
+                        }
 
-                    if (buffer.length() == 0) {
-                        // Stream was empty.  No point in parsing.
-                        return;
-                    }
+                        if (buffer.length() == 0) {
+                            // Stream was empty.  No point in parsing.
+                            return;
+                        }
 
-                    if (k == 1 ) {
-                        reviewJsonStr = buffer.toString();
-                        getReviewDataFromJson(reviewJsonStr);
-                        Log.v(LOG_TAG, "Review: " + reviewJsonStr + " Value of k: " + k);
-                    } else if (k == 0) {
-                        movieJsonStr = buffer.toString();
-                        getMovieDataFromJson(movieJsonStr);
-                        Log.v(LOG_TAG, "Movie string: " + movieJsonStr);
-                        k++;
-                    }
+                        //Load the movies table first then the the reviews
+                        if (k == 1 ) {
+
+                            reviewJsonStr = buffer.toString();
+                            getReviewDataFromJson(reviewJsonStr);
+                            Log.v(LOG_TAG, "Review: " + reviewJsonStr + " Value of k: " + k);
+                        } else if (k == 0) {
+
+                            movieJsonStr = buffer.toString();
+                            getMovieDataFromJson(movieJsonStr);
+                            Log.v(LOG_TAG, "Movie string: " + movieJsonStr);
+                            k++;
+                        }
 
 
 
@@ -252,9 +242,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                 }catch (MalformedURLException e){
                     Log.e(LOG_TAG, "Malformed URL", e);
                 }
-//                FetchReviewTask reviewTask = new FetchReviewTask(getContext());
-//                reviewTask.execute(reviews);
-
                 cVVector.add(movieValues);
 
             }
@@ -428,3 +415,15 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
         getSyncAccount(context);
     }
 }
+/*                 NOTE: DO THIS LATER
+                   If the preference is highest rated movies then the base URL will contain a vote count key also
+                   so that movies which have less than 70 votes are eliminated from the list
+
+                   If the preference is popularity, base url contains only api_key
+                   String preferenceChange= this.getString(R.string.pref_sortOrder_highestRated);
+//                if(sortOrder == getString(R.string.pref_sortOrder_highestRated)) {
+//                    MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=500&";
+//                } else {
+
+//                }
+                 */
