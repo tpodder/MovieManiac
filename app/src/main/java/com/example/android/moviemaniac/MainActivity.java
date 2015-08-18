@@ -14,13 +14,14 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
 
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
-    private String sortOrder;
+    private String sortOrder/*=getString(R.string.pref_sortOrder_mostPopular)*/;
     private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sortOrder = Utility.getPreferredSortOrder(this);
+
         android.support.v7.app.ActionBar menu = getSupportActionBar();
         // http://stackoverflow.com/questions/19540648/android-how-to-show-app-logo-in-action-bar
         menu.setDisplayShowHomeEnabled(true);

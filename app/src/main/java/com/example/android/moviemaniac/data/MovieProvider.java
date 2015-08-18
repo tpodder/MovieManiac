@@ -89,9 +89,9 @@ public class MovieProvider extends ContentProvider {
             Uri uri, String[] projection, String sortOrder) {
 
         String id = MovieContract.MovieEntry.getIDFromUri(uri);
-        String selection =  MovieContract.MovieEntry.COLUMN_MOVIE_ID+ "=?";
+        String selection =  MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry.COLUMN_MOVIE_ID+ "=?";
 
-        return sReviewQueryBuilder.query (mOpenHelper.getReadableDatabase(),
+        return sReviewQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 new String[]{id},
@@ -100,6 +100,25 @@ public class MovieProvider extends ContentProvider {
                 sortOrder
         );
     }
+
+
+//    private Cursor getMovieById(
+//            Uri uri, String[] projection, String sortOrder) {
+//
+//        String id = MovieContract.MovieEntry.getIDFromUri(uri);
+//        String selection =  MovieContract.MovieEntry.COLUMN_MOVIE_ID+ "=?";
+//
+//        return mOpenHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
+//                projection,
+//                selection,
+//                new String[]{id},
+//                null,
+//                null,
+//                sortOrder
+//        );
+//    }
+
+
 
 
     @Override
@@ -281,9 +300,10 @@ public class MovieProvider extends ContentProvider {
                 db.close();
                 return returnCount;
             }
-            default:
+            default: {
                 db.close();
                 return super.bulkInsert(uri, values);
+            }
 
         }
 

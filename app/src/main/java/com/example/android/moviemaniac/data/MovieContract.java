@@ -135,7 +135,7 @@ public class MovieContract {
               public static final String COLUMN_CONTENT = "review_content";
 
             public static final Uri CONTENT_URI =
-                    BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+                    BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
 
             public static final String CONTENT_TYPE =
                     ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
@@ -183,7 +183,7 @@ public class MovieContract {
         public static final String COLUMN_REVIEWS= "movie_reviews";
 
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;

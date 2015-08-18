@@ -31,7 +31,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private static final String LOG_TAG = MovieFragment.class.getSimpleName();
 
-    private static final int MOVIE_LOADER=0;
+    private static final int MOVIE_LOADER= 0;
     private static final String SELECTED_KEY = "selected_position";
 
     //Declaring variables for the movie adapter and gridview
@@ -39,7 +39,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     GridView gridView;
     Cursor mCursor;
     private int mPosition=gridView.INVALID_POSITION;
-    Cursor cursorWithNewSortPreference;
+
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry._ID,
@@ -74,8 +74,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        // Add this line in order for this fragment to handle menu events.
+// Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
 
@@ -153,13 +152,16 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     void onSortOrderChanged( ) {
         updateMovie();
+        movieAdapter.notifyDataSetChanged();
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+
+
      }
 
     //Executes FetchMovieTask
     private void updateMovie() {
         MovieSyncAdapter.syncImmediately(getActivity());
-    }
+   }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -189,6 +191,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         movieAdapter.swapCursor(cursor);
+//        gridView.setAdapter(movieAdapter);
         if (mPosition != GridView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.

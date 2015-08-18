@@ -1,6 +1,7 @@
 package com.example.android.moviemaniac;
 
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.moviemaniac.AsyncTasks.FetchReviewTask;
 import com.example.android.moviemaniac.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
@@ -40,6 +40,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
+//            MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER_LINK,
@@ -48,7 +49,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
             MovieContract.MovieEntry.COLUMN_REVIEWS,
-
+//
             MovieContract.MovieReviewsEntry.COLUMN_AUTHOR,
             MovieContract.MovieReviewsEntry.COLUMN_CONTENT,
     };
@@ -151,6 +152,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         reviewAdapter.swapCursor(data);
+        DatabaseUtils.dumpCursor(data);
         data.moveToFirst();
         if(data!=null && data.moveToFirst())
         {
@@ -185,8 +187,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 
 //                //Review
                 reviewList.setAdapter(reviewAdapter);
-                FetchReviewTask reviewTask = new FetchReviewTask(getActivity());
-                reviewTask.execute(data.getString(COLUMN_REVIEWS));
+
 
 //            }
 //            while(data.moveToNext());

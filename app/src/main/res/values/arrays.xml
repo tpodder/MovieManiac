@@ -3,6 +3,7 @@
     <string-array name="pref_sortOrder_options">
         <item>@string/pref_sortOrder_label_mostPopular</item>
         <item>@string/pref_sortOrder_label_highestRated</item>
+        <item>@string/pref_sortOrder_label_favorite</item>
     </string-array>
 
     <string-array name="pref_sortOrder_values">
