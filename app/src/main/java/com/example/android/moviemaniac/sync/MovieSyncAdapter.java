@@ -59,7 +59,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
 
         //Clear the urls stored during the previous Sync
         urls.clear();
-        
+
 
             URL urlMain;
             // These two need to be declared outside the try/catch
@@ -251,6 +251,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,null,null);
+                getContext().getContentResolver().delete(MovieContract.MovieReviewsEntry.CONTENT_URI, null, null);
+                Log.d(LOG_TAG, "Reviews deleted from table");
+
                 getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
             }
 
@@ -308,8 +311,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                getContext().getContentResolver().delete(MovieContract.MovieReviewsEntry.CONTENT_URI, null, null);
-                Log.d(LOG_TAG, "Reviews deleted from table");
                 getContext().getContentResolver().bulkInsert(MovieContract.MovieReviewsEntry.CONTENT_URI, cvArray);
                 Log.d(LOG_TAG, "Reviews added to table");
             }
