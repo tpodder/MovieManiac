@@ -1,5 +1,7 @@
 package com.example.android.moviemaniac;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,9 +52,12 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
             MovieContract.MovieEntry.COLUMN_REVIEWS,
-//
+
             MovieContract.MovieReviewsEntry.COLUMN_AUTHOR,
             MovieContract.MovieReviewsEntry.COLUMN_CONTENT,
+
+            MovieContract.MovieTrailerEntry.COLUMN_KEY,
+            MovieContract.MovieTrailerEntry.COLUMN_NAME
     };
 
     static final int COLUMN_ID=0;
@@ -65,6 +71,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     static final int COLUMN_REVIEWS = 8;
     static final int COLUMN_AUTHOR= 9;
     static final int COLUMN_CONTENT= 10;
+    static final int COLUMN_KEY= 11;
 
     //Views
     TextView textTitle,textRD,textRating,textOverview;
@@ -92,16 +99,12 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         textOverview=(TextView)rootView.findViewById(R.id.detail_overview);
 
         //trailers
-//        trailerAdapter = new TrailerAdapter(getActivity(),null,0);
-//        videoList=(ListView)rootView.findViewById(R.id.list_trailer);
-//
+        trailerAdapter = new TrailerAdapter(getActivity(),null,0);
+        videoList=(ListView)rootView.findViewById(R.id.list_trailer);
+
         //Reviews
         reviewAdapter = new ReviewAdapter(getActivity(),null,0);
         reviewList=(ListView)rootView.findViewById(R.id.list_reviews);
-//        FetchReviewTask reviewTask = new FetchReviewTask(getActivity());
-//        reviewTask.execute(mCursor.getString(COLUMN_REVIEWS));
-
-
 
         return rootView;
     }
@@ -152,6 +155,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         reviewAdapter.swapCursor(data);
+        trailerAdapter.swapCursor(data);
         DatabaseUtils.dumpCursor(data);
         data.moveToFirst();
         if(data!=null && data.moveToFirst())
@@ -188,21 +192,34 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 //                //Review
                 reviewList.setAdapter(reviewAdapter);
 
+                videoList.setAdapter(trailerAdapter);
 
-//            }
-//            while(data.moveToNext());
+//            http://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+            Log.d(LOG_TAG, "KEY COLUMN:" + data.getString(COLUMN_KEY));
 
+                videoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + cursor.getString(COLUMN_KEY)));
+                            startActivity(intent);
+                        }catch (ActivityNotFoundException ex){
+                            Intent intent=new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse("http://www.youtube.com/watch?v="+cursor.getString(COLUMN_KEY)));
+                            startActivity(intent);
+                        }
+                    }
+                });
 
-            //Set Adapters
-//            videoList.setAdapter(trailerAdapter);
-//            reviewList.setAdapter(reviewAdapter);
 
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {reviewAdapter.swapCursor(null); }
+    public void onLoaderReset(Loader<Cursor> loader) {reviewAdapter.swapCursor(null);
+        trailerAdapter.swapCursor(null);}
 
 
 }

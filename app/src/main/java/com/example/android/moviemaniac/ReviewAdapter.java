@@ -35,17 +35,13 @@ public class ReviewAdapter extends CursorAdapter {
 
     public void bindView(View view, Context context, Cursor cursor) {
 
-
-        TextView textView = (TextView) view.findViewById(R.id.text);
-        textView.setText("Reviews");
-
         TextView reviewView = (TextView) view.findViewById(R.id.reviews);
         reviewView.setText(cursor.getString(cursor.getColumnIndex
-                (MovieContract.MovieReviewsEntry.COLUMN_CONTENT))+":");
+                (MovieContract.MovieReviewsEntry.COLUMN_CONTENT)));
 
         TextView authorView = (TextView) view.findViewById(R.id.author);
         authorView.setText(cursor.getString(cursor.getColumnIndex
-                (MovieContract.MovieReviewsEntry.COLUMN_AUTHOR)));
+                (MovieContract.MovieReviewsEntry.COLUMN_AUTHOR))+":");
 
         DatabaseUtils.dumpCursor(cursor);
     }

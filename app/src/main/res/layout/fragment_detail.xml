@@ -11,13 +11,14 @@
     <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:id="@+id/scrollView"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="#fffffdf1"
             android:orientation="vertical"
             >
@@ -30,6 +31,7 @@
                 android:textColor="#fffffdf1"
                 android:background="#ff703e7c"
                 android:gravity="center"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="175dp"
@@ -38,6 +40,7 @@
                 android:paddingTop="10dp"
                 android:layout_below="@+id/detail_text"
                 android:background="#fffffdf1">
+
 
                 <ImageView
                     android:layout_width="125dp"
@@ -93,56 +96,43 @@
                 android:textStyle="normal"
                 android:textColor="#ff703e7c"
                 android:background="#fffffdf1"
-                android:layout_below="@+id/relative"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/purple_light"
+                android:gravity="center"
+                android:text="Videos"
+                android:id="@+id/textView" />
+
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="600dp"
+                android:id="@+id/list_trailer"
+
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/purple_light"
+                android:gravity="center"
+                android:text="Reviews"
+                />
 
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/list_reviews"/>
+                android:id="@+id/list_reviews"
+                />
 
             </LinearLayout>
     </ScrollView>
-    <!--<ListView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/list_trailer"-->
-        <!--class = ".DetailFragment"/>-->
-
-    <!--<ListView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/list_reviews"-->
-
-        <!--class = ".DetailFragment"/>-->
-    <!--android:layout_below="@+id/list_trailer"-->
-
 
 </FrameLayout>
 
-    <!--&lt;!&ndash;ListViews for trailers and reviews - INCOMPLETE-->
-    <!--<ListView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/list_trailer"-->
-    <!--android:layout_below="@+id/detail_overview">-->
-    <!--<VideoView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/video"/>-->
-
-    <!--</ListView>-->
-
-    <!--<ListView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/list_reviews"-->
-    <!--android:layout_below="@+id/list_trailer"-->
-    <!-->-->
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/reviews"/>-->
-    <!--</ListView>&ndash;&gt;-->
 

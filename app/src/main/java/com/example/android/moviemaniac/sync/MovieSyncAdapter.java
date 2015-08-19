@@ -42,7 +42,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
      public static final int SYNC_INTERVAL = 60 * 540;
      public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-    ArrayList<URL> urls = new ArrayList<URL>();
+    ArrayList<URL> urlsReviews = new ArrayList<URL>();
+    ArrayList<URL> urlsTrailers = new ArrayList<URL>();
+//    ArrayList<URL> urls = new ArrayList<URL>();
 
 
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
@@ -56,9 +58,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
         String sortOrder = Utility.getPreferredSortOrder(getContext());
         String movieJsonStr = null;
         String reviewJsonStr= null;
+        String trailerJsonStr= null;
 
         //Clear the urls stored during the previous Sync
-        urls.clear();
+        urlsReviews.clear();
+        urlsTrailers.clear();
+//        urls.clear();
 
 
             URL urlMain;
@@ -78,20 +83,29 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                     URL url = new URL(uri.toString());
                     urlMain= url;
                     Log.d(LOG_TAG, uri.toString());
-                    urls.add(url);
+//                    urls.add(url);
 
-                    //Maximum number of movies requested from API is 20 + 1 for the main url
-                    int max=21;
+                    //Maximum number of movies requested from API is 20*2 + 1 for the main url
+                    int max=41;
+//                    int max=21;
                     int k=0;
-                    for (int i = 0; i < max ; i++) {
+                    for (int i = 0; i < max ; ) {
 
                         //Create the request to The Movie Database, and open the connection
-                        if(k==0)
+                        if(i==0)
                         {
                             urlConnection = (HttpURLConnection)urlMain.openConnection();
-                        }else if(k==1)
+                            Log.v(LOG_TAG, "Main URL loaded");
+                        }else if(i>=1 && i<21)
                         {
-                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
+                            urlConnection=(HttpURLConnection)urlsReviews.get(i-1).openConnection();
+                            Log.v(LOG_TAG, "Reviews opened");
+//                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
+                        }else if(i>=21)
+                        {
+                            urlConnection=(HttpURLConnection)urlsTrailers.get(i-21).openConnection();
+                            Log.v(LOG_TAG, "Trailers opened");
+//                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
                         }
 
                         urlConnection.setRequestMethod("GET");
@@ -121,22 +135,29 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                         }
 
                         //Load the movies table first then the the reviews
-                        if (k == 1 ) {
-
-                            reviewJsonStr = buffer.toString();
-                            getReviewDataFromJson(reviewJsonStr);
-                            Log.v(LOG_TAG, "Review: " + reviewJsonStr + " Value of k: " + k);
-                        } else if (k == 0) {
+                        if (i == 0) {
 
                             movieJsonStr = buffer.toString();
                             getMovieDataFromJson(movieJsonStr);
                             Log.v(LOG_TAG, "Movie string: " + movieJsonStr);
-                            k++;
+                            i++;
+                        }else if (i >= 1 && i<21) {
+
+                            reviewJsonStr = buffer.toString();
+                            getReviewDataFromJson(reviewJsonStr);
+                            Log.v(LOG_TAG, "Review: " + reviewJsonStr + " Value of k: " + k);
+                            i++;
+                        }  else if (i >= 21 ) {
+
+                            trailerJsonStr = buffer.toString();
+                            getTrailerDataFromJson(trailerJsonStr);
+                            Log.v(LOG_TAG, "Trailer: " + trailerJsonStr + " Value of k: " + k);
+                            i++;
                         }
 
 
 
-                }
+                    }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -238,7 +259,18 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                             .build();
 
                     URL url = new URL(uri.toString());
-                    urls.add(url);
+//                    urls.add(url);
+                    urlsReviews.add(url);
+                }catch (MalformedURLException e){
+                    Log.e(LOG_TAG, "Malformed URL", e);
+                }
+                try {
+                    Uri uri = Uri.parse(trailerLinks).buildUpon()
+                            .build();
+
+                    URL url = new URL(uri.toString());
+//                    urls.add(url);
+                    urlsTrailers.add(url);
                 }catch (MalformedURLException e){
                     Log.e(LOG_TAG, "Malformed URL", e);
                 }
@@ -250,8 +282,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI,null,null);
+                getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
                 getContext().getContentResolver().delete(MovieContract.MovieReviewsEntry.CONTENT_URI, null, null);
+                getContext().getContentResolver().delete(MovieContract.MovieTrailerEntry.CONTENT_URI,null,null);
                 Log.d(LOG_TAG, "Reviews deleted from table");
 
                 getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
@@ -286,6 +319,20 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             // Insert the new review information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(reviewArray.length());
             cVVector.clear();
+            if (reviewArray.length() == 0){
+                //Get review data
+                authorName = "";
+                content = "Sorry, there are no reviews for this movie.";
+
+                //Store in database
+                ContentValues reviewValues = new ContentValues();
+
+                reviewValues.put(MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID, id);
+                reviewValues.put(MovieContract.MovieReviewsEntry.COLUMN_AUTHOR, authorName);
+                reviewValues.put(MovieContract.MovieReviewsEntry.COLUMN_CONTENT, content);
+
+                cVVector.add(reviewValues);
+            }
             for (int i = 0; i < reviewArray.length(); i++) {
 
                 // Get the JSON object representing the day
@@ -316,6 +363,64 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             }
 
             Log.d(LOG_TAG, "FetchReviewTask Complete.  Inserted");
+
+        }catch (JSONException e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void getTrailerDataFromJson(String trailerJsonStr)
+            throws JSONException {
+
+        // These are the names of the JSON objects that need to be extracted.
+        final String RESULTS = "results";
+        final String KEY = "key";
+        final String NAME = "name";
+        final String MOVIE_ID = "id";
+
+        String key, name;
+        int id;
+
+        try {
+
+            JSONObject trailerJson = new JSONObject(trailerJsonStr);
+            JSONArray trailerArray = trailerJson.getJSONArray(RESULTS);
+            id = trailerJson.getInt(MOVIE_ID);
+
+            // Insert the new review information into the database
+            Vector<ContentValues> cVVector = new Vector<ContentValues>(trailerArray.length());
+            cVVector.clear();
+            for (int i = 0; i < trailerArray.length(); i++) {
+
+                // Get the JSON object representing the day
+                JSONObject trailer = trailerArray.getJSONObject(i);
+
+                //Get trailer data
+                key = trailer.getString(KEY);
+                name = trailer.getString(NAME);
+
+                //Store in database
+                ContentValues trailerValues = new ContentValues();
+
+                trailerValues.put(MovieContract.MovieTrailerEntry.COLUMN_MOVIE_ID, id);
+                trailerValues.put(MovieContract.MovieTrailerEntry.COLUMN_KEY, key);
+                trailerValues.put(MovieContract.MovieTrailerEntry.COLUMN_NAME, name);
+
+                cVVector.add(trailerValues);
+
+
+            }
+
+            // add to database
+            if (cVVector.size() > 0) {
+                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                cVVector.toArray(cvArray);
+                getContext().getContentResolver().bulkInsert(MovieContract.MovieTrailerEntry.CONTENT_URI, cvArray);
+                Log.d(LOG_TAG, "Trailers added to table");
+            }
+
+            Log.d(LOG_TAG, "Trailers inserted");
 
         }catch (JSONException e) {
             Log.e("Error", e.getMessage());

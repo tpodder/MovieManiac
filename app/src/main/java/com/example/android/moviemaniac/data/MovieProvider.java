@@ -21,6 +21,7 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE = 100;
     static final int MOVIE_WITH_ID=101;
     static final int REVIEW = 102;
+    static final int TRAILER = 103;
 
     private static final SQLiteQueryBuilder sReviewQueryBuilder;
 
@@ -34,7 +35,12 @@ public class MovieProvider extends ContentProvider {
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
                         " = " + MovieContract.MovieReviewsEntry.TABLE_NAME +
-                        "." + MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID);
+                        "." + MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID+ " INNER JOIN " +
+                MovieContract.MovieTrailerEntry.TABLE_NAME  +
+                " ON " + MovieContract.MovieEntry.TABLE_NAME +
+                "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
+                " = " + MovieContract.MovieTrailerEntry.TABLE_NAME +
+                "." + MovieContract.MovieTrailerEntry.COLUMN_MOVIE_ID);
     }
 
     /*
@@ -54,6 +60,7 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_REVIEW, REVIEW);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER, TRAILER);
         return matcher;
     }
 
@@ -80,6 +87,8 @@ public class MovieProvider extends ContentProvider {
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             case REVIEW:
                 return MovieContract.MovieReviewsEntry.CONTENT_TYPE;
+            case TRAILER:
+                return MovieContract.MovieTrailerEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -101,22 +110,6 @@ public class MovieProvider extends ContentProvider {
         );
     }
 
-
-//    private Cursor getMovieById(
-//            Uri uri, String[] projection, String sortOrder) {
-//
-//        String id = MovieContract.MovieEntry.getIDFromUri(uri);
-//        String selection =  MovieContract.MovieEntry.COLUMN_MOVIE_ID+ "=?";
-//
-//        return mOpenHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
-//                projection,
-//                selection,
-//                new String[]{id},
-//                null,
-//                null,
-//                sortOrder
-//        );
-//    }
 
 
 
@@ -157,6 +150,20 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
+            }
+
+                // "TRAILER
+                case TRAILER: {
+                    retCursor = mOpenHelper.getReadableDatabase().query(
+                            MovieContract.MovieTrailerEntry.TABLE_NAME,
+                            projection,
+                            selection,
+                            selectionArgs,
+                            null,
+                            null,
+                            sortOrder
+                    );
 
                 break;
             }
@@ -192,6 +199,14 @@ public class MovieProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case TRAILER: {
+                long _id = db.insert(MovieContract.MovieTrailerEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = MovieContract.MovieTrailerEntry.buildMovieUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -216,6 +231,10 @@ public class MovieProvider extends ContentProvider {
             case REVIEW:
                 rowsDeleted = db.delete(
                         MovieContract.MovieReviewsEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case TRAILER:
+                rowsDeleted = db.delete(
+                        MovieContract.MovieTrailerEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -246,6 +265,11 @@ public class MovieProvider extends ContentProvider {
             case REVIEW:
                 rowsUpdated = db.update(
                         MovieContract.MovieReviewsEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case TRAILER:
+                rowsUpdated = db.update(
+                        MovieContract.MovieTrailerEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
 
@@ -288,6 +312,24 @@ public class MovieProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(MovieContract.MovieReviewsEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                db.close();
+                return returnCount;
+            }
+            case TRAILER: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MovieContract.MovieTrailerEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

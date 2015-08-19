@@ -50,6 +50,15 @@ public class MovieDbHelper extends SQLiteOpenHelper{
 
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE);
 
+        final String SQL_CREATE_TRAILER_TABLE = "CREATE TABLE IF NOT EXISTS " +
+                MovieContract.MovieTrailerEntry.TABLE_NAME + " (" +
+                MovieContract.MovieTrailerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MovieContract.MovieTrailerEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.MovieTrailerEntry.COLUMN_KEY + " TEXT NOT NULL, " +
+                MovieContract.MovieTrailerEntry.COLUMN_NAME + " TEXT NOT NULL " + ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE);
+
     }
 
     @Override
@@ -62,6 +71,7 @@ public class MovieDbHelper extends SQLiteOpenHelper{
         // should be your top priority before modifying this method.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieReviewsEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieTrailerEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
