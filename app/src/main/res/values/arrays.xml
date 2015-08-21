@@ -9,5 +9,6 @@
     <string-array name="pref_sortOrder_values">
         <item>@string/pref_sortOrder_mostPopular</item>
         <item>@string/pref_sortOrder_highestRated</item>
+        <item>@string/pref_sortOrder_favorite</item>
     </string-array>
 </resources>

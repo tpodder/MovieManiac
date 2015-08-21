@@ -37,8 +37,9 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     //Declaring variables for the movie adapter and gridview
     private MovieAdapter movieAdapter;
     GridView gridView;
-    Cursor mCursor;
+
     private int mPosition=gridView.INVALID_POSITION;
+
 
 
     private static final String[] MOVIE_COLUMNS ={
@@ -51,6 +52,18 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
             MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
             MovieContract.MovieEntry.COLUMN_REVIEWS
+    };
+
+    private static final String[] FAVORITE_COLUMNS ={
+            MovieContract.MovieEntry._ID,
+            MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieFavoriteEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieFavoriteEntry.COLUMN_RATING,
+            MovieContract.MovieFavoriteEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieFavoriteEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieFavoriteEntry.COLUMN_REVIEWS
     };
 
     static final int COLUMN_ID=0;
@@ -114,6 +127,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         // up with an empty list the first time we run.
 
         // We'll call our MainActivity
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -122,18 +136,24 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 Log.v(LOG_TAG, "Position=" + position);
-
+                String sortOrder=Utility.getPreferredSortOrder(getActivity());
                 if (cursor != null) {
-
-                    ((Callback) getActivity()).onItemSelected(
-                            MovieContract.MovieEntry.buildMovieUriWithMovieID
-                                    (cursor.getString(COLUMN_MOVIE_ID)));
+                    if (getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
+                        ((Callback) getActivity()).onItemSelected(
+                                MovieContract.MovieFavoriteEntry.buildMovieUriWithMovieID
+                                        (cursor.getString(COLUMN_MOVIE_ID)));
+                    } else {
+                        ((Callback) getActivity()).onItemSelected(
+                                MovieContract.MovieEntry.buildMovieUriWithMovieID
+                                        (cursor.getString(COLUMN_MOVIE_ID)));
+                    }
 
                 }
 
                 mPosition = position;
 
-            }});
+            }
+        });
 
             if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
                     // The listview probably hasn't even been populated yet.  Actually perform the
@@ -151,8 +171,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     void onSortOrderChanged( ) {
-        updateMovie();
-        movieAdapter.notifyDataSetChanged();
+        String sortOrder=Utility.getPreferredSortOrder(getActivity());
+        if(!getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
+            updateMovie();
+            movieAdapter.notifyDataSetChanged();
+        }
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
 
 
@@ -165,14 +188,27 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String sortOrder=Utility.getPreferredSortOrder(getActivity());
 
-        Uri uri = MovieContract.MovieEntry.CONTENT_URI;
-        return new CursorLoader(getActivity(),
-                uri,
-                MOVIE_COLUMNS,
-                null,
-                null,
-                null);
+        if(getString(R.string.pref_sortOrder_favorite).equals(sortOrder))
+        {
+            Uri uri = MovieContract.MovieFavoriteEntry.CONTENT_URI;
+            return new CursorLoader(getActivity(),
+                    uri,
+                    FAVORITE_COLUMNS,
+                    null,
+                    null,
+                    null);
+
+        }else {
+            Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+            return new CursorLoader(getActivity(),
+                    uri,
+                    MOVIE_COLUMNS,
+                    null,
+                    null,
+                    null);
+        }
     }
 
     @Override

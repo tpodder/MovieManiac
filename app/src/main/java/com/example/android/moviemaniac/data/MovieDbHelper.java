@@ -59,6 +59,42 @@ public class MovieDbHelper extends SQLiteOpenHelper{
 
         sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE);
 
+        final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE IF NOT EXISTS " + MovieContract.MovieFavoriteEntry.TABLE_NAME + " (" +
+                // Why AutoIncrement here, and not above?
+                // Unique keys will be auto-generated in either case.  But for weather
+                // forecasting, it's reasonable to assume the user will want information
+                // for a certain date and all dates *following*, so the forecast data
+                // should be sorted accordingly.
+                MovieContract.MovieFavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_POSTER_LINK + " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
+                MovieContract.MovieFavoriteEntry.COLUMN_RATING+ " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_OVERVIEW+ " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_TRAILER_LINKS+ " TEXT NOT NULL, " +
+                MovieContract.MovieFavoriteEntry.COLUMN_REVIEWS+ " TEXT NOT NULL " + ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_FAVORITE_TABLE);
+
+        final String SQL_CREATE_REVIEW_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " +
+                MovieContract.FavoriteReviewsEntry.TABLE_NAME + " (" +
+                MovieContract.FavoriteReviewsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MovieContract.FavoriteReviewsEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.FavoriteReviewsEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
+                MovieContract.FavoriteReviewsEntry.COLUMN_CONTENT + " TEXT NOT NULL " + ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_REVIEW_TABLE_FAVORITE);
+
+        final String SQL_CREATE_TRAILER_TABLE_FAVORITE = "CREATE TABLE IF NOT EXISTS " +
+                MovieContract.FavoriteTrailerEntry.TABLE_NAME + " (" +
+                MovieContract.FavoriteTrailerEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                MovieContract.FavoriteTrailerEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                MovieContract.FavoriteTrailerEntry.COLUMN_KEY + " TEXT NOT NULL, " +
+                MovieContract.FavoriteTrailerEntry.COLUMN_NAME + " TEXT NOT NULL " + ");";
+
+        sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE_FAVORITE);
+
     }
 
     @Override
@@ -72,6 +108,9 @@ public class MovieDbHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieReviewsEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieTrailerEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieFavoriteEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.FavoriteReviewsEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.FavoriteTrailerEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

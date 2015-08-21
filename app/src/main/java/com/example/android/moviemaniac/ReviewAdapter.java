@@ -41,7 +41,7 @@ public class ReviewAdapter extends CursorAdapter {
 
         TextView authorView = (TextView) view.findViewById(R.id.author);
         authorView.setText(cursor.getString(cursor.getColumnIndex
-                (MovieContract.MovieReviewsEntry.COLUMN_AUTHOR))+":");
+                (MovieContract.MovieReviewsEntry.COLUMN_AUTHOR)));
 
         DatabaseUtils.dumpCursor(cursor);
     }

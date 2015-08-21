@@ -36,7 +36,7 @@ public class TrailerAdapter extends CursorAdapter {
 
         TextView textView2 = (TextView) view.findViewById(R.id.name);
         textView2.setText(cursor.getString(cursor.getColumnIndex
-                (MovieContract.MovieTrailerEntry.COLUMN_NAME))+":");
+                (MovieContract.MovieTrailerEntry.COLUMN_NAME)));
 
         ImageView imageView = (ImageView) view.findViewById(R.id.videoImg);
         imageView.setImageResource(R.drawable.youtube);

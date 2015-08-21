@@ -25,6 +25,8 @@ public class MovieContract {
     public static final String PATH_REVIEW= "review";
     public static final String PATH_TRAILER= "trailer";
     public static final String PATH_FAVORITE= "favorite";
+    public static final String PATH_FAVORITE_REVIEW= "favoriteReview";
+    public static final String PATH_FAVORITE_TRAILER= "favoriteTrailer";
 
 
 
@@ -198,7 +200,7 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Uri buildMovieUriWithName(String movieID) {
+        public static Uri buildMovieUriWithMovieID(String movieID) {
             return CONTENT_URI.buildUpon().appendPath(movieID)
                     .build();
         }
@@ -207,6 +209,63 @@ public class MovieContract {
             return uri.getPathSegments().get(1);
         }
 
+
+    }
+
+    public static final class FavoriteTrailerEntry implements BaseColumns {
+
+        public static final String TABLE_NAME = "trailer_favorite";
+
+        //Movie ID
+        public static final String COLUMN_MOVIE_ID = "id";
+
+        //Review Author
+        public static final String COLUMN_KEY = "trailer_key";
+
+        //Review Author
+        public static final String COLUMN_NAME = "trailer_name";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITE_TRAILER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+    }
+    //
+    /* Inner class that defines the table contents of the trailer table */
+    public static final class FavoriteReviewsEntry implements BaseColumns {
+
+        public static final String TABLE_NAME = "reviews_favorite";
+        //Store id, author and content
+        //Movie ID
+        public static final String COLUMN_MOVIE_ID = "id";
+
+        //Review Author
+        public static final String COLUMN_AUTHOR = "review_author";
+
+        //Review Author
+        public static final String COLUMN_CONTENT = "review_content";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITE_REVIEW).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
 
     }
 }

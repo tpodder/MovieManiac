@@ -28,10 +28,8 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
         menu.setLogo(R.mipmap.ic_launcher);
         menu.setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_main);
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//            .add(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG)
-//                    .commit();
+
+
         if(findViewById((R.id.movie_detail_container))!=null)
         {
             //the detail container view will be present only in the large-screen layouts
@@ -51,7 +49,9 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
             mTwoPane=false;
         }
 
-        MovieSyncAdapter.initializeSyncAdapter(this);
+        if(!getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
+            MovieSyncAdapter.initializeSyncAdapter(this);
+        }
     }
 
 

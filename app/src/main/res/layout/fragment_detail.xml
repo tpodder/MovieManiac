@@ -111,7 +111,7 @@
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="600dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/list_trailer"
 
                 />
@@ -126,7 +126,7 @@
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="1200dp"
                 android:id="@+id/list_reviews"
                 />
 
