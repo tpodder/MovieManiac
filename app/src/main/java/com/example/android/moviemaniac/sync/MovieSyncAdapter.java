@@ -37,15 +37,13 @@ import java.util.Vector;
  */
 public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
     public final String LOG_TAG = MovieSyncAdapter.class.getSimpleName();
-    // Interval at which to sync with the weather, in seconds.
+    // Interval at which to sync with the movie DB, in seconds.
     // 60 seconds (1 minute) * 540 = 9 hours
      public static final int SYNC_INTERVAL = 60 * 540;
      public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     ArrayList<URL> urlsReviews = new ArrayList<URL>();
     ArrayList<URL> urlsTrailers = new ArrayList<URL>();
-//    ArrayList<URL> urls = new ArrayList<URL>();
-
 
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -55,16 +53,14 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
 
-        String sortOrder = Utility.getPreferredSortOrder(getContext());
-        String movieJsonStr = null;
-        String reviewJsonStr= null;
-        String trailerJsonStr= null;
+            String sortOrder = Utility.getPreferredSortOrder(getContext());
+            String movieJsonStr = null;
+            String reviewJsonStr= null;
+            String trailerJsonStr= null;
 
-        //Clear the urls stored during the previous Sync
-        urlsReviews.clear();
-        urlsTrailers.clear();
-//        urls.clear();
-
+            //Clear the urls stored during the previous Sync
+            urlsReviews.clear();
+            urlsTrailers.clear();
 
             URL urlMain;
             // These two need to be declared outside the try/catch
@@ -72,7 +68,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                    String MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=70&";
+                    String MOVIE_BASE_URL =
+                            "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=70&";
 
                     // Construct the URL for The Movie Database query
                     final String QUERY_PARAM = "sort_by";
@@ -83,14 +80,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                     URL url = new URL(uri.toString());
                     urlMain= url;
                     Log.d(LOG_TAG, uri.toString());
-//                    urls.add(url);
-
                     //Maximum number of movies requested from API is 20*2 + 1 for the main url
                     int max=41;
-//                    int max=21;
-                    int k=0;
 
-
+                    // Opens the Main URL first to load the movie details and get urls for
+                    // reviews and trailers and then opens the urls stored in the array lists
+                    // urlReviews and urlTrailers
                     for (int i = 0; i < max ; ) {
 
                         //Create the request to The Movie Database, and open the connection
@@ -104,12 +99,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                             urlConnection=(HttpURLConnection)urlsReviews.get(i-1).openConnection();
                             Log.v(LOG_TAG, "Reviews opened");
 
-//                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
                         }else if(i>=21)
                         {
                             urlConnection=(HttpURLConnection)urlsTrailers.get(i-21).openConnection();
                             Log.v(LOG_TAG, "Trailers opened");
-//                            urlConnection=(HttpURLConnection)urls.get(i).openConnection();
                         }
 
                         urlConnection.setRequestMethod("GET");
@@ -153,13 +146,13 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
 
                             reviewJsonStr = buffer.toString();
                             getReviewDataFromJson(reviewJsonStr);
-                            Log.v(LOG_TAG, "Review: " + reviewJsonStr + " Value of k: " + k);
+                            Log.v(LOG_TAG, "Review: " + reviewJsonStr);
                             i++;
                         }  else if (i >= 21 ) {
 
                             trailerJsonStr = buffer.toString();
                             getTrailerDataFromJson(trailerJsonStr);
-                            Log.v(LOG_TAG, "Trailer: " + trailerJsonStr + " Value of k: " + k);
+                            Log.v(LOG_TAG, "Trailer: " + trailerJsonStr);
                             i++;
                         }
 
@@ -290,10 +283,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
+                //delete data stored in previous sync
                 getContext().getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
                 getContext().getContentResolver().delete(MovieContract.MovieReviewsEntry.CONTENT_URI, null, null);
                 getContext().getContentResolver().delete(MovieContract.MovieTrailerEntry.CONTENT_URI, null, null);
-                Log.d(LOG_TAG, "Reviews deleted from table");
 
                 getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
             }
@@ -328,6 +321,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             Vector<ContentValues> cVVector = new Vector<ContentValues>(reviewArray.length());
             cVVector.clear();
 
+            // If there are no reviews for a movie, then add a no reviews message
             if(reviewArray.length()>0)
             {
                 for (int i = 0; i < reviewArray.length(); i++) {
@@ -352,11 +346,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                 }
             } else if(reviewArray.length()==0){
 
-                //Get review data
                 authorName = "";
                 content = "Sorry, there are no reviews for this movie.";
 
-                //Store in database
                 ContentValues reviewValues = new ContentValues();
 
                 reviewValues.put(MovieContract.MovieReviewsEntry.COLUMN_MOVIE_ID, id);
@@ -401,9 +393,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             JSONArray trailerArray = trailerJson.getJSONArray(RESULTS);
             id = trailerJson.getInt(MOVIE_ID);
 
-            // Insert the new review information into the database
+            // Insert the new trailer information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(trailerArray.length());
             cVVector.clear();
+            // If there are no trailers for a movie, then add a no trailers message
             if(trailerArray.length()>0) {
                 for (int i = 0; i < trailerArray.length(); i++) {
 
@@ -427,11 +420,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
                 }
             }else if(trailerArray.length()==0)
             {
-                //Get review data
                 name = "Sorry, there are no trailers.";
                 key = "";
 
-                //Store in database
                 ContentValues trailerValues = new ContentValues();
 
                 trailerValues.put(MovieContract.MovieTrailerEntry.COLUMN_MOVIE_ID, id);

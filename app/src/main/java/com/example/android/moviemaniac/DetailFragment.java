@@ -38,28 +38,43 @@ import com.squareup.picasso.Picasso;
  * Created by Tanushree on 2015-07-27.
  *
  * Detail Fragment Class
+ *
  */
 public  class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     static final String DETAIL_URI = "URI";
 
-    private String movie;
     private Uri mUri;
     private static final int DETAIL_LOADER=0;
-    TrailerAdapter trailerAdapter;
-    ReviewAdapter reviewAdapter;
-    Cursor mCursor;
+
+    private TrailerAdapter trailerAdapter;
+    private ReviewAdapter reviewAdapter;
+
+    //Refrence to the cursor containing details.
+    // Used to ontain Movie ID to insert in Favorites table.
+    private Cursor mCursor;
 
     private ShareActionProvider mShareActionProvider;
-    String mVideo;
-    String shareKey;
+    private String shareKey;
 
-    private static final String MOVIE_SHARE_HASHTAG = " #MovieManiacApp";
-
+    // Projections for Movies, Movie joined with Review, Movie joined with Trailer, Favorite,
+    // Favorite joined with FavoriteReview and Favorite joined with FavoriteTrailers Table
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
-//            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieEntry.COLUMN_REVIEWS,
+
+    };
+
+    private static final String[] REVIEW_COLUMNS ={
+            MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
             MovieContract.MovieEntry.COLUMN_POSTER_LINK,
@@ -72,14 +87,42 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.FavoriteReviewsEntry.COLUMN_AUTHOR,
             MovieContract.FavoriteReviewsEntry.COLUMN_CONTENT,
 
+    };
+
+    private static final String[] TRAILER_COLUMNS ={
+            MovieContract.MovieEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieEntry.COLUMN_REVIEWS,
+
+            MovieContract.FavoriteTrailerEntry.COLUMN_NAME,
             MovieContract.FavoriteTrailerEntry.COLUMN_KEY,
-            MovieContract.FavoriteTrailerEntry.COLUMN_NAME
+
     };
 
     private static final String[] FAVORITE_COLUMNS ={
             MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
+            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+
+                    MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieFavoriteEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieFavoriteEntry.COLUMN_RATING,
+            MovieContract.MovieFavoriteEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieFavoriteEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieFavoriteEntry.COLUMN_REVIEWS,
 
-            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
+    };
+
+    private static final String[] FAVORITE_REVIEW_COLUMNS ={
+            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
+            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+
+                    MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE,
             MovieContract.MovieFavoriteEntry.COLUMN_POSTER_LINK,
             MovieContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE,
@@ -91,8 +134,22 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.MovieReviewsEntry.COLUMN_AUTHOR,
             MovieContract.MovieReviewsEntry.COLUMN_CONTENT,
 
-            MovieContract.MovieTrailerEntry.COLUMN_KEY,
-            MovieContract.MovieTrailerEntry.COLUMN_NAME
+    };
+
+    private static final String[] FAVORITE_TRAILER_COLUMNS ={
+            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+MovieContract.MovieEntry._ID,
+
+            MovieContract.MovieFavoriteEntry.TABLE_NAME+"."+MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieFavoriteEntry.COLUMN_POSTER_LINK,
+            MovieContract.MovieFavoriteEntry.COLUMN_RELEASE_DATE,
+            MovieContract.MovieFavoriteEntry.COLUMN_RATING,
+            MovieContract.MovieFavoriteEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieFavoriteEntry.COLUMN_TRAILER_LINKS,
+            MovieContract.MovieFavoriteEntry.COLUMN_REVIEWS,
+
+            MovieContract.MovieTrailerEntry.COLUMN_NAME,
+            MovieContract.MovieTrailerEntry.COLUMN_KEY
     };
 
     static final int COLUMN_ID=0;
@@ -104,15 +161,17 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     static final int COLUMN_OVERVIEW = 6;
     static final int COLUMN_TRAILER_LINKS = 7;
     static final int COLUMN_REVIEWS = 8;
+
     static final int COLUMN_AUTHOR= 9;
     static final int COLUMN_CONTENT= 10;
-    static final int COLUMN_KEY= 11;
+
+    static final int COLUMN_KEY= 10;
 
     //Views
-    TextView textTitle,textRD,textRating,textOverview;
-    ImageView imgView;
-    ListView videoList, reviewList;
-    ImageButton favorite;
+    private TextView textTitle,textRD,textRating,textOverview;
+    private ImageView imgView;
+    private ListView videoList, reviewList;
+    private ImageButton favorite;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -126,6 +185,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
+
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         textTitle=(TextView)rootView.findViewById(R.id.detail_text);
@@ -172,8 +232,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v="+shareKey );
-//        shareIntent.putExtra(Intent.EXTRA_TEXT, mForecast + FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + shareKey);
         return shareIntent;
     }
 
@@ -203,12 +262,17 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         }
     }
 
+
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
         if(mUri!=null)
         {
+            //Checks the sort order and accordingly loads data from either
+            // the Movie Table or Favorite Table
             String sortOrder=Utility.getPreferredSortOrder(getActivity());
+
             if(getString(R.string.pref_sortOrder_favorite).equals(sortOrder)){
                 return new CursorLoader(
                         getActivity(),
@@ -228,8 +292,27 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         }
         return null;
     }
-    //Testing insertion
-    int inserted=0;
+
+
+    /**Copy Data from one table to another with same Movie ID
+     *
+     * @param tableName1
+     * @param tableName2
+     *
+     * Sources:
+     * http://stackoverflow.com/questions/25155412/android-copy-values-from-table-and-insert-in-another
+     */
+    public void copyIntoTable1FromTable2(String tableName1, String tableName2){
+        MovieDbHelper mOpenHelper = new MovieDbHelper(getActivity());
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        String sql = "INSERT INTO "+tableName1+
+                " SELECT * FROM "+tableName2+" WHERE "+MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID
+                +" = "+ mCursor.getInt(COLUMN_MOVIE_ID)+" ;";
+        db.execSQL(sql);
+
+        db.close();
+
+    }
 
     public void favoriteButtonAction(Cursor detCursor)
     {
@@ -243,7 +326,7 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
         //If the movie exists in the favorite's list, then display a toast
         if (favoriteCursor.moveToFirst()) {
             Context context = getActivity();
-            CharSequence text = "This movie already exists in the favorites list";
+            CharSequence text = "This movie already exists in the favorites";
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
@@ -283,43 +366,53 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             favoriteValues.put(MovieContract.MovieFavoriteEntry.COLUMN_REVIEWS, reviews);
 
 
-            Uri insertedUri = getActivity().getContentResolver().insert(MovieContract.MovieFavoriteEntry.CONTENT_URI, favoriteValues);
-            inserted++;
-//            http://stackoverflow.com/questions/25155412/android-copy-values-from-table-and-insert-in-another
-            MovieDbHelper mOpenHelper = new MovieDbHelper(getActivity());
-            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            String sql1 = "INSERT INTO "+MovieContract.FavoriteReviewsEntry .TABLE_NAME+
-                    " SELECT * FROM "+MovieContract.MovieReviewsEntry.TABLE_NAME+" WHERE "+MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID
-                    +" = "+ mCursor.getInt(COLUMN_MOVIE_ID)+" ;";
-            db.execSQL(sql1);
-            String sql2 = "INSERT INTO "+MovieContract.FavoriteTrailerEntry .TABLE_NAME+
-                    " SELECT * FROM "+MovieContract.MovieTrailerEntry.TABLE_NAME+" WHERE "+MovieContract.MovieFavoriteEntry.COLUMN_MOVIE_ID
-                    +" = "+ mCursor.getInt(COLUMN_MOVIE_ID)+" ;";
-            db.execSQL(sql2);
+            Uri insertedUri = getActivity().getContentResolver()
+                    .insert(MovieContract.MovieFavoriteEntry.CONTENT_URI, favoriteValues);
 
-            db.close();
-            //Insert reviews and trailers in the favorite movies review/trailer table
-            Log.d(LOG_TAG, inserted + " items inserted");
+            copyIntoTable1FromTable2(MovieContract.FavoriteReviewsEntry .TABLE_NAME,
+                    MovieContract.MovieReviewsEntry.TABLE_NAME);
+            copyIntoTable1FromTable2(MovieContract.FavoriteTrailerEntry .TABLE_NAME,
+                    MovieContract.MovieTrailerEntry.TABLE_NAME);
+
+            //Display a toast so that user knows that the item is inserted in favorites
+            Context context = getActivity();
+            CharSequence text = "Movie added to favorites";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+
         }
 
     }
 
-    //http://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
+    /**
+     * Get ListView Height based on children
+     *
+     * @param listView           reviewList/trailerList
+     * @return void
+     *
+     * Source:
+     * http://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view
+     */
+    public static void setListViewHeightBasedOnChildren(ListView listView)
+    {
         ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
+        if(listAdapter == null) return;
+        if(listAdapter.getCount() <= 1) return;
 
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),
+                View.MeasureSpec.AT_MOST);
         int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        View view = null;
+        for(int i = 0; i < listAdapter.getCount(); i++)
+        {
+            view = listAdapter.getView(i, view, listView);
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
 
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
@@ -329,18 +422,13 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         mCursor = data;
-        reviewAdapter.swapCursor(data);
-        trailerAdapter.swapCursor(data);
-        DatabaseUtils.dumpCursor(data);
         data.moveToFirst();
+        DatabaseUtils.dumpCursor(data);
+
         if(data!=null && data.moveToFirst())
         {
-//            do {
-
                 int position = data.getPosition();
-                Log.v(LOG_TAG, "Position=" + position);
                 data.moveToPosition(position);
-
 
                 //Detail Activity via Intent
                 //The detail Activity called via intent.  Inspect the intent for movie data.
@@ -350,7 +438,8 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 
                 //Image- Movie Poster
                 String movieLink = data.getString(COLUMN_POSTER_LINK);
-                Picasso.with(getActivity()).load(movieLink).placeholder(R.drawable.image_url).into(imgView);
+                Picasso.with(getActivity()).load(movieLink).placeholder(R.drawable.image_url)
+                        .into(imgView);
 
                 //Release Date
                 String movieReleaseDate = data.getString(COLUMN_RELEASE_DATE);
@@ -362,60 +451,107 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
 
                 //Overview
                 String movieOverview = data.getString(COLUMN_OVERVIEW);
-            textOverview.setText(movieOverview);
+                textOverview.setText(movieOverview);
 
-//                //Review
-                reviewList.setAdapter(reviewAdapter);
+                //Reviews and Trailers
+                //Check sort order and query join on Movie-Review, Movie-Trailer,
+                //Or query join on Favorite-FavoriteReview, Favorite-FavoriteTrailer
+                //To get reviews and trailers data
+                Cursor review, trailer;
+                String sortOrder=Utility.getPreferredSortOrder(getActivity());
+                if(getString(R.string.pref_sortOrder_favorite).equals(sortOrder)){
+                    review=getActivity().getContentResolver().query(
+                            MovieContract.FavoriteReviewsEntry.buildMovieUriWithMovieID(
+                                    data.getString(COLUMN_MOVIE_ID)),
+                            FAVORITE_REVIEW_COLUMNS,
+                            null,
+                            null,
+                            null);
+                    trailer=getActivity().getContentResolver().query(
+                            MovieContract.FavoriteTrailerEntry.buildMovieUriWithMovieID(
+                                    data.getString(COLUMN_MOVIE_ID)),
+                            FAVORITE_TRAILER_COLUMNS,
+                            null,
+                            null,
+                            null);
 
-            videoList.setAdapter(trailerAdapter);
+                }else{
+                    review=getActivity().getContentResolver().query(
+                            MovieContract.MovieReviewsEntry.buildMovieUriWithMovieID(
+                                    data.getString(COLUMN_MOVIE_ID)),
+                            REVIEW_COLUMNS,
+                            null,
+                            null,
+                            null);
+                    trailer=getActivity().getContentResolver().query(
+                            MovieContract.MovieTrailerEntry
+                                    .buildMovieUriWithMovieID(data.getString(COLUMN_MOVIE_ID)),
+                            TRAILER_COLUMNS,
+                            null,
+                            null,
+                            null);
 
-//            setListViewHeightBasedOnChildren(reviewList);
-
-            setListViewHeightBasedOnChildren(videoList);
-
-
-
-//            http://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
-            Log.d(LOG_TAG, "KEY COLUMN:" + data.getString(COLUMN_KEY));
-
-            videoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                    try {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + cursor.getString(COLUMN_KEY)));
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException ex) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse("http://www.youtube.com/watch?v=" + cursor.getString(COLUMN_KEY)));
-                        startActivity(intent);
-                    }
                 }
+
+
+                reviewAdapter.swapCursor(review);
+                trailerAdapter.swapCursor(trailer);
+
+                trailer.moveToFirst();
+                review.moveToFirst();
+
+                reviewList.setAdapter(reviewAdapter);
+                videoList.setAdapter(trailerAdapter);
+
+                setListViewHeightBasedOnChildren(reviewList);
+                setListViewHeightBasedOnChildren(videoList);
+
+                // Displays videos on clicking list item through either the youtube app or through the
+                // website for the video
+                //Source:
+                // http://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+                videoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                        Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                    "vnd.youtube:" + cursor.getString(COLUMN_KEY)));
+                            startActivity(intent);
+                        } catch (ActivityNotFoundException ex) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                    "http://www.youtube.com/watch?v=" +
+                                            cursor.getString(COLUMN_KEY)));
+                            startActivity(intent);
+                        }
+                    }
                 });
 
-            favorite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    favoriteButtonAction(mCursor);
+                if(trailer!=null && trailer.moveToFirst()) {
+                    shareKey=trailer.getString(COLUMN_KEY);
                 }
-            });
 
-            shareKey=data.getString(COLUMN_KEY);
+                favorite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-            // If onCreateOptionsMenu has already happened, we need to update the share intent now.
-            if (mShareActionProvider != null) {
-                mShareActionProvider.setShareIntent(createShareVideoIntent());
-            }
+                        favoriteButtonAction(mCursor);
+                    }
+                });
 
-
+                // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareVideoIntent());
+                }
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {reviewAdapter.swapCursor(null);
-        trailerAdapter.swapCursor(null);}
+    public void onLoaderReset(Loader<Cursor> loader) {
+        reviewAdapter.swapCursor(null);
+        trailerAdapter.swapCursor(null);
+    }
 
 
 }

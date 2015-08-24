@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fffffdf1">
+    android:background="@color/background_white">
 
     <!--NOTE: The image used is the Youtube video icon-->
     <ImageView
-        android:layout_width="250dp"
-        android:layout_height="175dp"
+        android:layout_width="175dp"
+        android:layout_height="100dp"
         android:id="@+id/videoImg"
         />
 
@@ -15,10 +15,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/purple_light"
-        android:textSize="18sp"
+        android:textSize="@dimen/text_size_detail_fragment"
         android:id="@+id/name"
         android:layout_gravity="center"
-        android:paddingLeft="20dp"/>
+        />
 
 
 </LinearLayout>

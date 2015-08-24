@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-/*
-   Detail Activity Class to get the details of a movie
- */
+
 
 public class DetailActivity extends ActionBarActivity {
 
@@ -52,5 +50,6 @@ public class DetailActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

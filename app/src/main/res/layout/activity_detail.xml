@@ -5,4 +5,4 @@
     tools:layout="@layout/fragment_detail" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="MergeRootFrame"/>
-    <!--android:name="com.example.android.moviemaniac.DetailFragment"-->
+

@@ -12,18 +12,22 @@
     <!-- Label for most popular option in sort order preference [CHAR LIMIT=25] -->
     <string name="pref_sortOrder_label_mostPopular">Most Popular</string>
 
-    <!-- Label for imperial option in temperature unit preference [CHAR LIMIT=25] -->
+    <!-- Label for most highest rated option in sort order preference [CHAR LIMIT=25] -->
     <string name="pref_sortOrder_label_highestRated">Highest Rated</string>
+
+    <!-- Label for most favorite option in sort order preference [CHAR LIMIT=25] -->
     <string name="pref_sortOrder_label_favorite">Favorite</string>
 
-    <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <!-- Key name for Sort Order preference in SharedPreferences [CHAR LIMIT=NONE] -->
     <string name="pref_sortOrder_key" translatable="false">sort_by</string>
 
-    <!-- Value in SharedPreferences for metric temperature unit option [CHAR LIMIT=NONE] -->
+    <!-- Value in SharedPreferences for popular movies option [CHAR LIMIT=NONE] -->
     <string name="pref_sortOrder_mostPopular" translatable="false">popularity.desc</string>
 
-    <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
+    <!-- Value in SharedPreferences for highest rated option [CHAR LIMIT=NONE] -->
     <string name="pref_sortOrder_highestRated" translatable="false">vote_average.desc</string>
+
+    <!-- Value in SharedPreferences for favorite movie option [CHAR LIMIT=NONE] -->
     <string name="pref_sortOrder_favorite" translatable="false">favorite</string>
 
     <string name="title_activity_detail">Movie Details</string>
@@ -32,5 +36,9 @@
     <string name="sync_account_type">moviemaniac.example.com</string>
     <string name="content_authority">com.example.android.moviemaniac</string>
 
+    <!--UI related strings-->
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="tabletDetail">Click on a poster to view movie details</string>
 
 </resources>

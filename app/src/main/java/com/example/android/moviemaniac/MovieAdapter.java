@@ -15,11 +15,11 @@ import com.squareup.picasso.Picasso;
 
 public class MovieAdapter extends CursorAdapter {
 
-    //Declaring the context and a logtag for debugging
+
     Context c;
     private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
 
-   //adapter constructor
+
     public MovieAdapter(Activity context,Cursor cursor, int flags) {
 
         super(context, cursor, flags);

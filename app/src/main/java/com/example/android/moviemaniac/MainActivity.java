@@ -17,19 +17,22 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
     private String sortOrder/*=getString(R.string.pref_sortOrder_mostPopular)*/;
     private boolean mTwoPane;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sortOrder = Utility.getPreferredSortOrder(this);
 
+        //Show logo in app
+        //Source:
+        //http://stackoverflow.com/questions/19540648/android-how-to-show-app-logo-in-action-bar
         android.support.v7.app.ActionBar menu = getSupportActionBar();
-        // http://stackoverflow.com/questions/19540648/android-how-to-show-app-logo-in-action-bar
         menu.setDisplayShowHomeEnabled(true);
         menu.setLogo(R.mipmap.ic_launcher);
         menu.setDisplayUseLogoEnabled(true);
+
+
         setContentView(R.layout.activity_main);
-
-
         if(findViewById((R.id.movie_detail_container))!=null)
         {
             //the detail container view will be present only in the large-screen layouts
@@ -41,13 +44,14 @@ public class MainActivity extends ActionBarActivity implements MovieFragment.Cal
             //fragment transaction
             if(savedInstanceState==null)
             {
-                getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container, new DetailFragment(),
-                        DETAILFRAGMENT_TAG).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container,
+                        new DetailFragment(), DETAILFRAGMENT_TAG).commit();
             }
 
         } else {
             mTwoPane=false;
         }
+
 
         if(!getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
             MovieSyncAdapter.initializeSyncAdapter(this);

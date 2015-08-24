@@ -23,8 +23,9 @@ import com.example.android.moviemaniac.sync.MovieSyncAdapter;
 
 
 
-/* http://maciejpasynkiewicz.com/?p=79
-   Encapsulates fetching Movie Data and displaying it in a Grid View format
+/** The App icon/logo has been taken from the following website for personal use only:
+ * http://maciejpasynkiewicz.com/?p=79
+ * Encapsulates fetching Movie Data and displaying it in a Grid View format
  */
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -34,13 +35,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final int MOVIE_LOADER= 0;
     private static final String SELECTED_KEY = "selected_position";
 
-    //Declaring variables for the movie adapter and gridview
     private MovieAdapter movieAdapter;
     GridView gridView;
 
     private int mPosition=gridView.INVALID_POSITION;
-
-
 
     private static final String[] MOVIE_COLUMNS ={
             MovieContract.MovieEntry._ID,
@@ -87,7 +85,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-// Add this line in order for this fragment to handle menu events.
+
         setHasOptionsMenu(true);
     }
 
@@ -102,12 +100,12 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+//        int id = item.getItemId();
         //Action performed by refresh button in the menu
-        if (id == R.id.action_refresh) {
-            updateMovie();
-            return true;
-        }
+//        if (id == R.id.action_refresh) {
+//            updateMovie();
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -116,17 +114,13 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //Get cursor and Initialize adapter, get a reference to GridView, set adapter to ot and update data
+        //Get cursor and Initialize adapter, get a reference to GridView, set adapter to it and
+        // update data
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         movieAdapter = new MovieAdapter(getActivity(),null,0);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
         gridView.setAdapter(movieAdapter);
 
-         // The CursorAdapter will take data from our cursor and populate the ListView
-        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
-        // up with an empty list the first time we run.
-
-        // We'll call our MainActivity
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -137,6 +131,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 Log.v(LOG_TAG, "Position=" + position);
                 String sortOrder=Utility.getPreferredSortOrder(getActivity());
+
+                // Checks sort order and sends the appropriate Uri to the Callback
                 if (cursor != null) {
                     if (getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
                         ((Callback) getActivity()).onItemSelected(
@@ -156,8 +152,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         });
 
             if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-                    // The listview probably hasn't even been populated yet.  Actually perform the
-                    // swapout in onLoadFinished.
+
                     mPosition = savedInstanceState.getInt(SELECTED_KEY);
             }
 
@@ -172,6 +167,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     void onSortOrderChanged( ) {
         String sortOrder=Utility.getPreferredSortOrder(getActivity());
+
         if(!getString(R.string.pref_sortOrder_favorite).equals(sortOrder)) {
             updateMovie();
             movieAdapter.notifyDataSetChanged();
@@ -181,13 +177,15 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
      }
 
-    //Executes FetchMovieTask
+    //Executes SyncAdapter
     private void updateMovie() {
         MovieSyncAdapter.syncImmediately(getActivity());
    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        //Check sort order and load data accordingly
+
         String sortOrder=Utility.getPreferredSortOrder(getActivity());
 
         if(getString(R.string.pref_sortOrder_favorite).equals(sortOrder))
@@ -227,7 +225,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         movieAdapter.swapCursor(cursor);
-//        gridView.setAdapter(movieAdapter);
         if (mPosition != GridView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.

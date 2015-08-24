@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--Setting activitytheme -->
+    <!--Setting activity theme -->
     <style name="SettingsTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/purple_light</item>
         <item name="colorPrimaryDark">@color/purple_dark</item>
