@@ -387,15 +387,15 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     /**
-     * Get ListView Height based on children
+     * Get ListView Height based on children for reviews
      *
-     * @param listView           reviewList/trailerList
+     * @param listView           reviewList
      * @return void
      *
      * Source:
      * http://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view
      */
-    public static void setListViewHeightBasedOnChildren(ListView listView)
+    public static void setListViewHeightBasedOnChildrenReviews(ListView listView)
     {
         ListAdapter listAdapter = listView.getAdapter();
         if(listAdapter == null) return;
@@ -413,6 +413,35 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
             totalHeight += view.getMeasuredHeight();
         }
 
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
+    /**
+     * Get ListView Height based on children for trailers
+     *
+     * @param listView           videoList
+     * @return void
+     *
+     * Source:
+     * http://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view
+     */
+    public static void setListViewHeightBasedOnChildrenTrailer(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
@@ -503,8 +532,8 @@ public  class DetailFragment extends Fragment implements LoaderManager.LoaderCal
                 reviewList.setAdapter(reviewAdapter);
                 videoList.setAdapter(trailerAdapter);
 
-                setListViewHeightBasedOnChildren(reviewList);
-                setListViewHeightBasedOnChildren(videoList);
+                setListViewHeightBasedOnChildrenReviews(reviewList);
+                setListViewHeightBasedOnChildrenTrailer(videoList);
 
                 // Displays videos on clicking list item through either the youtube app or through the
                 // website for the video
