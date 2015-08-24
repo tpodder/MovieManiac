@@ -23,8 +23,7 @@ import com.example.android.moviemaniac.sync.MovieSyncAdapter;
 
 
 
-/** The App icon/logo has been taken from the following website for personal use only:
- * http://maciejpasynkiewicz.com/?p=79
+/**
  * Encapsulates fetching Movie Data and displaying it in a Grid View format
  */
 
