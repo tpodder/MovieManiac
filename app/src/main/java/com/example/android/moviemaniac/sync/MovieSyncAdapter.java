@@ -69,7 +69,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
             BufferedReader reader = null;
             try {
                     String MOVIE_BASE_URL =
-                            "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=70&";
+                            "http://api.themoviedb.org/3/discover/movie?api_key=####&vote_count.gte=70&";
 
                     // Construct the URL for The Movie Database query
                     final String QUERY_PARAM = "sort_by";
@@ -203,8 +203,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
         final String OVERVIEW = "overview";
         final String ID = "id";
         final String BASE_URL = "http://api.themoviedb.org/3/movie/";
-        final String MOVIE_TAILER_APPEND_URL = "/videos?api_key=84604ead3481bd3bbd687f383f87e738";
-        final String MOVIE_REVIEWS_APPEND_URL = "/reviews?api_key=84604ead3481bd3bbd687f383f87e738";
+        final String MOVIE_TAILER_APPEND_URL = "/videos?api_key=####";
+        final String MOVIE_REVIEWS_APPEND_URL = "/reviews?api_key=####;
 
         //Strings containing the data
         String movieName, urlPart, releaseDate, rating, overview, trailerLinks, reviews;
@@ -542,15 +542,3 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter{
         getSyncAccount(context);
     }
 }
-/*                 NOTE: DO THIS LATER
-                   If the preference is highest rated movies then the base URL will contain a vote count key also
-                   so that movies which have less than 70 votes are eliminated from the list
-
-                   If the preference is popularity, base url contains only api_key
-                   String preferenceChange= this.getString(R.string.pref_sortOrder_highestRated);
-//                if(sortOrder == getString(R.string.pref_sortOrder_highestRated)) {
-//                    MOVIE_BASE_URL = "http://api.themoviedb.org/3/discover/movie?api_key=84604ead3481bd3bbd687f383f87e738&vote_count.gte=500&";
-//                } else {
-
-//                }
-                 */
